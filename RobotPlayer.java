@@ -1,7 +1,6 @@
 package testplayer1;
 
 import java.util.Random;
-
 import battlecode.common.*;
 
 public class RobotPlayer {
@@ -25,7 +24,8 @@ public class RobotPlayer {
 				switch(rc.getType()){
 				case HQ:
 					shootWeakest();
-					spawnUnit(RobotType.BEAVER);
+					if(rc.getTeamOre()>510)
+						spawnUnit(RobotType.BEAVER);
 					break;
 				case BEAVER:
 					shootWeakest();
@@ -35,8 +35,10 @@ public class RobotPlayer {
 						if(randall.nextDouble()<0.05){
 							if(robotsOfTypeOnTeam(RobotType.MINERFACTORY, rc.getTeam())<4){
 								buildUnit(RobotType.MINERFACTORY);
-							}else{
+							}else if(robotsOfTypeOnTeam(RobotType.BARRACKS, rc.getTeam())<3){
 								buildUnit(RobotType.BARRACKS);
+							}else if(robotsOfTypeOnTeam(RobotType.TANKFACTORY, rc.getTeam())<2){
+								buildUnit(RobotType.TANKFACTORY);
 							}
 						}else{
 							moveAndMine();
@@ -62,6 +64,12 @@ public class RobotPlayer {
 					shootWeakest();
 					moveAsCloseToDirection(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
 					break;
+				case TANKFACTORY:
+					spawnUnit(RobotType.TANK);
+					break;
+				case TANK:
+					shootWeakest();
+					moveAsCloseToDirection(rc.getLocation().directionTo(rc.senseEnemyTowerLocations()[0]));
 				}
 			}catch(GameActionException e){
 				e.printStackTrace();
@@ -79,8 +87,10 @@ public class RobotPlayer {
 				}else{
 					toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
 				}
-				if(rc.senseRobotAtLocation(rc.getLocation()).team == rc.getTeam()){
-					rc.transferSupplies(toSupply, ri.location);
+				if(rc.senseRobotAtLocation(ri.location) != null){
+					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+						rc.transferSupplies(toSupply, ri.location);
+					}
 				}
 			}
 		}
@@ -97,7 +107,7 @@ public class RobotPlayer {
 	}
 
 	public static void moveAndMine() throws GameActionException{
-		if(rc.senseOre(rc.getLocation())>3){
+		if(rc.senseOre(rc.getLocation())>=1){
 			if(rc.isCoreReady()&&rc.canMine()){
 				rc.mine();
 			}
@@ -107,10 +117,26 @@ public class RobotPlayer {
 	}
 	
 	public static void buildUnit(RobotType toBuild) throws GameActionException{
-		Direction dir = getRandomDirection();
-		System.out.println(rc.isCoreReady()+ "     "+rc.canBuild(dir, toBuild)+ "     "+(rc.getTeamOre()>toBuild.oreCost));
-		if(rc.isCoreReady()&&rc.canBuild(dir, toBuild)&&rc.getTeamOre()>toBuild.oreCost){			
-			rc.build(dir, toBuild);			
+		boolean unitBuilt = false;
+		while(unitBuilt != true){
+			Direction dir = getRandomDirection();
+			Direction[] toTry = {dir,
+					dir.rotateLeft(),
+					dir.rotateRight(),
+					dir.rotateLeft().rotateLeft(),
+					dir.rotateRight().rotateRight(),
+					dir.rotateLeft().rotateLeft().rotateLeft(),
+					dir.rotateRight().rotateRight().rotateRight(),
+					dir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
+			};
+			for(Direction buildDir: toTry){
+				if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)&&rc.getTeamOre()>toBuild.oreCost){			
+					rc.build(buildDir, toBuild);
+					unitBuilt = true;
+					break;
+				}
+			}
+			rc.yield();
 		}
 	}
 	
