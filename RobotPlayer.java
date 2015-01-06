@@ -22,12 +22,12 @@ public class RobotPlayer {
 		while(true){
 			try {
 				supplyChain();
-				if(rc.getType() == RobotType.HQ){
+				switch(rc.getType()){
+				case HQ:
 					shootWeakest();
-					//if(rc.getTeamOre()>550){
-						spawnUnit(RobotType.BEAVER);
-					//}
-				}else if(rc.getType() == RobotType.BEAVER){
+					spawnUnit(RobotType.BEAVER);
+					break;
+				case BEAVER:
 					shootWeakest();
 					if(missionCounter<10){
 						moveAsCloseToDirectionSafe(toBoldlyGo);
@@ -42,25 +42,30 @@ public class RobotPlayer {
 							moveAndMine();
 						}
 					}
-				}else if(rc.getType() == RobotType.MINERFACTORY){
+					break;
+				case MINERFACTORY:
 					if(robotsOfTypeOnTeam(RobotType.MINER, rc.getTeam())<40){
 						spawnUnit(RobotType.MINER);
 					}
-				}else if(rc.getType() == RobotType.MINER){
+					break;
+				case MINER:
 					shootWeakest();
 					moveAndMine();
-				}else if(rc.getType() == RobotType.TOWER){
+					break;
+				case TOWER:
 					shootWeakest();
-				}else if(rc.getType() == RobotType.BARRACKS){
+					break;
+				case BARRACKS:
 					spawnUnit(RobotType.SOLDIER);
-				}else if(rc.getType() == RobotType.SOLDIER){
+					break;
+				case SOLDIER:
 					shootWeakest();
 					moveAsCloseToDirection(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
+					break;
 				}
-			} catch (GameActionException e) {
+			}catch(GameActionException e){
 				e.printStackTrace();
 			}
-			
 			rc.yield();
 		}
 	}
@@ -74,7 +79,9 @@ public class RobotPlayer {
 				}else{
 					toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
 				}
-				rc.transferSupplies(toSupply, ri.location);
+				if(rc.senseRobotAtLocation(rc.getLocation()).team == rc.getTeam()){
+					rc.transferSupplies(toSupply, ri.location);
+				}
 			}
 		}
 	}
