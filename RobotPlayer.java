@@ -5,6 +5,7 @@ import battlecode.common.*;
 public class RobotPlayer {
 	public static BaseRobot myself;
 	public static void run(RobotController rc){
+		//Initialize myself to a type based off of what type of robot we are
 		switch(rc.getType()){
 		case HQ:
 			myself = new HQ(rc);
@@ -70,6 +71,7 @@ public class RobotPlayer {
 			myself = new Missile(rc);
 			break;
 		}
+		//While true, run the run method in myself
 		while(true){
 			try{
 				myself.run();
