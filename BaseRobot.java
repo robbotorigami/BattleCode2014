@@ -2,6 +2,8 @@ package team079;
 
 import java.util.Random;
 
+import team079.util.BetterMapLocation;
+import team079.util.ComSystem;
 import battlecode.common.*;
 
 public abstract class BaseRobot {
@@ -16,6 +18,7 @@ public abstract class BaseRobot {
 		ComSystem.init(rc);
 		ourHQ = rc.senseHQLocation();
 		theirHQ = rc.senseEnemyHQLocation();
+		BetterMapLocation.init(rc);
 	}
 	
 	//Abstract method for major functionality

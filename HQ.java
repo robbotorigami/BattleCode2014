@@ -1,5 +1,6 @@
 package team079;
 
+import team079.util.ComSystem;
 import battlecode.common.*;
 
 public class HQ extends BaseRobot {
@@ -12,19 +13,19 @@ public class HQ extends BaseRobot {
 		rc = rcin;
 		
 		try {
-			ComSystem.sendLocation(10, rc.getLocation(), false);
+			ComSystem.sendLocation(10, rc.getLocation().add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()),10), false);
 		} catch (GameActionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		lastTime = 200;
+		lastTime = 600;
 		waypoint = rc.getLocation();
 	}
 	
 	@Override
 	public void run() throws GameActionException {
 		if(Clock.getRoundNum()>lastTime+20){
-			waypoint.add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
+			waypoint = waypoint.add(waypoint.directionTo(rc.senseEnemyHQLocation()));
 			ComSystem.sendLocation(10, waypoint, false);
 		}
 		spawnUnit(RobotType.BEAVER);

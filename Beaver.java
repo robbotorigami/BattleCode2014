@@ -1,5 +1,6 @@
 package team079;
 
+import team079.util.ComSystem;
 import battlecode.common.*;
 
 public class Beaver extends BaseRobot {
