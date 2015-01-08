@@ -13,7 +13,11 @@ public class Beaver extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 1){
+			buildUnit(RobotType.MINERFACTORY);
+		}
 		moveAsCloseToDirection(rc.getLocation().directionTo(ComSystem.getLocation(10)));
+		rc.yield();
 	}
 
 }

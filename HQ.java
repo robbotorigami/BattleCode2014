@@ -28,7 +28,9 @@ public class HQ extends BaseRobot {
 			waypoint = waypoint.add(waypoint.directionTo(rc.senseEnemyHQLocation()));
 			ComSystem.sendLocation(10, waypoint, false);
 		}
-		spawnUnit(RobotType.BEAVER);
+		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 1){
+			spawnUnit(RobotType.BEAVER);
+		}
 		rc.yield();
 	}
 
