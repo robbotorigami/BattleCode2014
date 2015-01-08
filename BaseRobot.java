@@ -8,6 +8,10 @@ public abstract class BaseRobot {
 		rc = rcin;
 	}
 	
+	public void doNothing(){
+		
+	}
+	
 	//Abstract method for major functionality
 	public abstract void run() throws GameActionException;
 	
