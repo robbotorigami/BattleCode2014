@@ -11,8 +11,14 @@ public class Beaver extends BaseRobot {
 	}
 	
 	@Override
+	
 	public void run() throws GameActionException {
-		// TODO Auto-generated method stub
+		Direction dir = getRandomDirection();
+		if(rc.isCoreReady()&&rc.canMove(dir)){
+			rc.move(dir);
+			
+		}
+			rc.yield();
 
 	}
 
