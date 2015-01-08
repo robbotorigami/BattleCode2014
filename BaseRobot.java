@@ -108,6 +108,28 @@ public abstract class BaseRobot {
 		return Direction.values()[rand.nextInt(8)];
 	}
 	
+	//Returns the index value of the provided direction
+	public int getIndexOfDirection(Direction dir){
+		Direction[] values = Direction.values();
+		for(int i =0; i<8; i++){
+			if(values[i]==dir){
+				return i;
+			}
+		}
+		//If no match is found, return north
+		return 0;
+	}
+	
+	//Calculates all of the ore that is withing one square of the robot
+	public int getOreNear(){
+		MapLocation[] near = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), 2);
+		double oreSum = 0;
+		for(MapLocation loc: near){
+			oreSum += rc.senseOre(loc);
+		}
+		return (int) oreSum;
+	}
+	
 	//Returns the number of robots that can be sensed of type type on the team provided
 	public int robotsOfTypeOnTeam(RobotType type, Team team) {
 		RobotInfo[] Robots = rc.senseNearbyRobots(10000000, team);

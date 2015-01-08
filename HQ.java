@@ -24,6 +24,7 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		ComSystem.clearMiningInfo();
 		if(Clock.getRoundNum()>lastTime+20){
 			waypoint = waypoint.add(waypoint.directionTo(rc.senseEnemyHQLocation()));
 			ComSystem.sendLocation(10, waypoint, false);

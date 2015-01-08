@@ -1,9 +1,14 @@
 package team079;
 
+import team079.util.ComSystem;
 import battlecode.common.*;
 
 public class Miner extends BaseRobot {
 	public RobotController rc;
+	public Direction lastMove;
+	public Direction defaultMove;
+	public MapLocation defaultLocation;
+	public final int MININGAVGCHANNEL = 50;
 	
 	public Miner(RobotController rcin){
 		super(rcin);
@@ -13,10 +18,19 @@ public class Miner extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		mineAndMove();
+		updateMiningInfo();
+		ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 		rc.yield();
 
 	}
 	
+	private void updateMiningInfo() throws GameActionException {
+		if(lastMove != null)
+			ComSystem.addToAverage(MININGAVGCHANNEL, getIndexOfDirection(lastMove));
+		defaultMove = Direction.values()[ComSystem.getAverage(MININGAVGCHANNEL)];
+	}
+	
+
 	//Handles basic mining action
 	public void mineAndMove() throws GameActionException{
 		//If there is ore, mine it!
@@ -35,9 +49,16 @@ public class Miner extends BaseRobot {
 					selected = dir;
 				}
 			}
+			//If all ore < 0.4, follow the crowd
+			if(bestOre <0.4){
+				if(rand.nextDouble()<0.5){
+					selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
+				}
+			}
 			//Move to the selected square
 			if(rc.isCoreReady()&&rc.canMove(selected)){
 				rc.move(selected);
+				lastMove = selected;
 			}
 			
 		}

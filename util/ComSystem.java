@@ -2,9 +2,10 @@ package team079.util;
 
 import battlecode.common.*;
 
-//TODO See if there is any way to condsen
+//Basic ComSystem package, to keep the communication system working well
 public class ComSystem {
 	public static RobotController rc;
+	public static final int ORELOG = 100;
 	
 	public static void init(RobotController rcin){
 		rc = rcin;
@@ -53,33 +54,109 @@ public class ComSystem {
 			y = message%1000;
 		}
 		return new BetterMapLocation(x,y).toMapLoc();
-	}	
+	}
 	
-	//-------------------Mining Communication Methods------------------------------
-	public static void writeMiningInfo(MapLocation loc, double ore) throws GameActionException{
-		BetterMapLocation bLoc = new BetterMapLocation(loc);
-		int channel = 50000+bLoc.x*120+bLoc.y;
-		int iOre = (int)(ore*10);
-		rc.broadcast(channel, iOre);		
+	// Syncronized versions
+	
+	public static void sendLocationSync(int channel, int x, int y, boolean flag) throws GameActionException{
+		sendLocationSync(channel, new MapLocation(x,y), flag);
 	}
-	public static void writeminingInfo(MapLocation loc) throws GameActionException{
-		BetterMapLocation bLoc = new BetterMapLocation(loc);
-		int channel = 50000+bLoc.x*120+bLoc.y;
-		rc.broadcast(channel, 10000001);
+	
+	public static void sendLocationSync(int channel, MapLocation loc, boolean flag) throws GameActionException {
+		//Encode in the format fsyyysxxx
+		sendLocationSync(channel, new BetterMapLocation(loc),flag);	
 	}
-	public static boolean readHasBeenMined(MapLocation loc) throws GameActionException{
-		BetterMapLocation bLoc = new BetterMapLocation(loc);
-		int channel = 50000+bLoc.x*120+bLoc.y;
-		if(rc.readBroadcast(channel) == 10000001){
-			return true;
-		}else{
-			return false;
+	//Send one map location and one boolean flag
+	public static void sendLocationSync(int channel, BetterMapLocation loc, boolean flag) throws GameActionException{
+		//Encode in the format fsyyysxxx
+		int message = Math.abs(loc.x);
+		message += Math.abs(loc.y)*10000;
+		if(loc.x<0){
+			message += 1000;
 		}
-	}
-	public static double readOre(MapLocation loc) throws GameActionException{
-		BetterMapLocation bLoc = new BetterMapLocation(loc);
-		int channel = 50000+bLoc.x*120+bLoc.y;
-		return((double)rc.readBroadcast(channel));
+		if(loc.y<0){
+			message += 10000000;
+		}
+		if(flag){
+			message += 100000000;
+		}
+		writeSync(channel, message);	
 	}
 
+	public static MapLocation getLocationSync(int channel) throws GameActionException{
+		int message = readSync(channel);
+		//Decode in the format fsyyysxxx
+		int x;
+		int y;
+		if((message/1000)%10 != 0){
+			x = -message%1000;
+		}else{
+			x = message%1000;
+		}
+		message = message/10000;
+		if((message/1000)%10 != 0){
+			y = -message%1000;
+		}else{
+			y = message%1000;
+		}
+		return new BetterMapLocation(x,y).toMapLoc();
+	}
+	
+	//---------------------Average Calculation Methods-------------------------
+	public static void addToAverage(int channel, int toAdd) throws GameActionException{
+		//Add one to the running  tally
+		writeSync(channel+2,readSync(channel+2)+1);
+		//Add to the total
+		writeSync(channel,readSync(channel)+toAdd);
+		
+	}
+	
+	public static int getAverage(int channel) throws GameActionException{
+		//Read the current total
+		int avg = readSync(channel);
+		//divide by tally and return
+		int div = readSync(channel+2);
+		if(div == 0){
+			return 0;
+		}
+		return avg/readSync(channel+2);
+	}
+	
+	//------------------Sync Methods------------------------------
+	//read a message from the proper channel if synced
+	private static int readSync(int channel) throws GameActionException{
+		//If match num is even, use the alt channel
+		if(Clock.getRoundNum()%2 == 0){
+			return rc.readBroadcast(channel+1);
+		}else{
+			return rc.readBroadcast(channel);
+		}
+	}
+	
+	//Send a message to the proper channel
+	private static void writeSync(int channel, int toWrite) throws GameActionException{
+		//If match num is odd, use the alt channel
+		if(Clock.getRoundNum()%2 == 0){
+			rc.broadcast(channel, toWrite);
+		}else{
+			rc.broadcast(channel, toWrite);
+		}
+	}
+	
+	//-------------------Mining Communication Methods------------------------------
+	//Log the location sent if it is a better place to mine
+	public static void logMiningIfBetter(int oreAtLoc, MapLocation loc) throws GameActionException{
+		if(oreAtLoc>rc.readBroadcast(ORELOG)){
+			rc.broadcast(ORELOG, oreAtLoc);
+			sendLocationSync(ORELOG+1, loc, false);
+		}
+	}
+	
+	public static MapLocation getMiningLoc() throws GameActionException{
+		return getLocationSync(ORELOG+1);
+	}
+
+	public static void clearMiningInfo() throws GameActionException{
+		rc.broadcast(ORELOG, 0);
+	}
 }
