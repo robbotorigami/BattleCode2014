@@ -2,6 +2,7 @@ package team079;
 
 import battlecode.common.*;
 
+//TODO Fix the way how the screwy map system works
 public class ComSystem {
 	public static RobotController rc;
 	
@@ -23,6 +24,7 @@ public class ComSystem {
 	
 	public static MapLocation getLocation(int channel) throws GameActionException{
 		int message = rc.readBroadcast(channel);
+		System.out.println(message+"");
 		return new MapLocation(message%1000,(message%1000000)/1000);
 	}	
 

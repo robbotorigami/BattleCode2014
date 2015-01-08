@@ -12,8 +12,7 @@ public class Beaver extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		// TODO Auto-generated method stub
-
+		moveAsCloseToDirection(rc.getLocation().directionTo(ComSystem.getLocation(10)));
 	}
 
 }
