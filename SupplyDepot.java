@@ -1,4 +1,4 @@
-package team079;
+package testplayer2;
 
 import battlecode.common.*;
 
