@@ -18,4 +18,17 @@ public abstract class BaseRobot {
 	public Direction getRandomDirection(){
 		return Direction.values()[rand.nextInt(8)];
 	}
+	
+	//public void moveAsClose
+	public boolean safeToMove(Direction dir){
+		boolean safe = true; 
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, rc.getTeam().opponent());
+		for(RobotInfo ri: enemiesInRange){
+			if(rc.getLocation().add(dir).distanceSquaredTo(ri.location)<=ri.type.attackRadiusSquared){
+				safe = false;
+				break;
+			}
+		}
+		return safe;
+	}
 }
