@@ -3,26 +3,21 @@ package testplayer2;
 import battlecode.common.*;
 
 public class HQ extends BaseRobot {
-	public RobotController rc;
-	public int beaverCount;
 	
+	public RobotController rc;
+
+
 	public HQ(RobotController rcin){
 		super(rcin);
+		numberOfBeavers = 0;
 		rc = rcin;
-		beaverCount = 0;
 	}
-	
-	@Override
+
+	Direction dir = getRandomDirection();
 	public void run() throws GameActionException {
-		
-		Direction dir = getRandomDirection();
-		if(rc.isCoreReady()&&rc.canSpawn(dir , RobotType.BEAVER)&&beaverCount<3){
-			
+		if(rc.isCoreReady()&&rc.canSpawn(dir, RobotType.BEAVER)){
+
 			rc.spawn(dir, RobotType.BEAVER);
-			beaverCount++;
 		}
-		rc.yield();
-
 	}
-
 }
