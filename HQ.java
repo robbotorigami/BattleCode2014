@@ -32,6 +32,7 @@ public class HQ extends BaseRobot {
 		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 1){
 			spawnUnit(RobotType.BEAVER);
 		}
+		System.out.println(ComSystem.getMiningLoc());
 		rc.yield();
 	}
 

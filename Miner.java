@@ -18,8 +18,7 @@ public class Miner extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		mineAndMove();
-		updateMiningInfo();
-		ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
+		//updateMiningInfo();
 		rc.yield();
 
 	}
@@ -59,6 +58,7 @@ public class Miner extends BaseRobot {
 			if(rc.isCoreReady()&&rc.canMove(selected)){
 				rc.move(selected);
 				lastMove = selected;
+				ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 			}
 			
 		}

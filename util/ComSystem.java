@@ -6,6 +6,7 @@ import battlecode.common.*;
 public class ComSystem {
 	public static RobotController rc;
 	public static final int ORELOG = 100;
+	private static MapLocation miningLocation;
 	
 	public static void init(RobotController rcin){
 		rc = rcin;
@@ -146,17 +147,23 @@ public class ComSystem {
 	//-------------------Mining Communication Methods------------------------------
 	//Log the location sent if it is a better place to mine
 	public static void logMiningIfBetter(int oreAtLoc, MapLocation loc) throws GameActionException{
+		//Only log every ten turns
 		if(oreAtLoc>rc.readBroadcast(ORELOG)){
 			rc.broadcast(ORELOG, oreAtLoc);
-			sendLocationSync(ORELOG+1, loc, false);
+			sendLocation(ORELOG+1, loc, false);
 		}
 	}
-	
+
 	public static MapLocation getMiningLoc() throws GameActionException{
-		return getLocationSync(ORELOG+1);
+		if(miningLocation == null || Clock.getRoundNum()%10==0){
+			miningLocation = getLocation(ORELOG+1);
+		}
+		
+		return miningLocation;
 	}
 
 	public static void clearMiningInfo() throws GameActionException{
+		//Only clear log every ten turns
 		rc.broadcast(ORELOG, 0);
 	}
 }
