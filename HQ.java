@@ -86,7 +86,7 @@ public class HQ extends BaseRobot {
 		for(RobotInfo ri: Robots){
 			if(ri.supplyLevel<200){
 				int toSupply = 0;
-				toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
+				toSupply = Math.max((int) ((rc.getSupplyLevel()-ri.supplyLevel)/16), 200);
 				if(ri.type == RobotType.DRONE){
 					toSupply = (int)rc.getSupplyLevel()/2;
 				}

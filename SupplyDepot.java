@@ -12,8 +12,8 @@ public class SupplyDepot extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		// TODO Auto-generated method stub
-
+		
+		rc.yield();
 	}
 
 }
