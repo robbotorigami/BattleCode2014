@@ -17,11 +17,14 @@ public class Drone extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		shootWeakest();
-
 		if(supplyingLaunchers){
+			if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199))<40){
+				supplyLaunchers();
+			}
 			basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 			if(rc.getSupplyLevel()<200){
 				supplyingLaunchers = false;
+				
 			}
 
 		}
