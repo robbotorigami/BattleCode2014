@@ -45,7 +45,7 @@ public class HQ extends BaseRobot {
 		for(int i = 0; i<numWaypoints; i++){
 			waypoints[i] = rc.getLocation().add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()), i*WAYPOINTDISTANCE);
 		}
-		currentWaypoint = 2;
+		currentWaypoint = 1;
 	}
 	
 	public void handleSwarm() throws GameActionException{
