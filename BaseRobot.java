@@ -42,6 +42,28 @@ public abstract class BaseRobot {
 			}
 		}
 	}
+	public void launchAtWeakest() throws GameActionException{
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, rc.getTeam().opponent());
+		double LowestHealth = 10000;
+		RobotInfo weakestLink = null;
+		for(RobotInfo ri:enemiesInRange){
+			if(ri.type == RobotType.TOWER){
+				weakestLink = ri;
+				break;
+			}
+			if(ri.health<LowestHealth){
+				weakestLink = ri;
+				LowestHealth = ri.health;
+			}
+			
+		}
+		
+		if(weakestLink != null){
+			if(rc.isWeaponReady()&&rc.canLaunch(rc.getLocation().directionTo(weakestLink.location))&&rc.getMissileCount()>=1){
+				rc.launchMissile(rc.getLocation().directionTo(weakestLink.location));
+			}
+		}
+	}
 	//Will try to spawn a Unit of a given type
 	public void spawnUnit(RobotType toSpawn) throws GameActionException{
 		if(rc.isCoreReady()){
