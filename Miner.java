@@ -9,6 +9,7 @@ public class Miner extends BaseRobot {
 	public Direction defaultMove;
 	public MapLocation defaultLocation;
 	public final int MININGAVGCHANNEL = 50;
+	public int roundLastSkipped = 0;
 	
 	public Miner(RobotController rcin){
 		super(rcin);
@@ -27,13 +28,19 @@ public class Miner extends BaseRobot {
 		if(lastMove != null)
 			ComSystem.addToAverage(MININGAVGCHANNEL, getIndexOfDirection(lastMove));
 		defaultMove = Direction.values()[ComSystem.getAverage(MININGAVGCHANNEL)];
-	}
-	
+	}	
 
 	//Handles basic mining action
 	public void mineAndMove() throws GameActionException{
-		//If there is ore, mine it!
-		if(rc.senseOre(rc.getLocation()) >0.2){
+		//If there is ore, and we aren't blocking miners, mine it!
+		boolean skipSquare = false;
+		if(ComSystem.getUselessMiners()>5){
+			if(Clock.getRoundNum()-roundLastSkipped > 10){
+				skipSquare = true;
+				roundLastSkipped = Clock.getRoundNum();
+			}
+		}
+		if(rc.senseOre(rc.getLocation()) >0.2 && !skipSquare){
 			if(rc.isCoreReady()&&rc.canMine())
 				rc.mine();
 		}else{
@@ -47,16 +54,20 @@ public class Miner extends BaseRobot {
 					bestOre = rc.senseOre(rc.getLocation().add(dir));
 					selected = dir;
 				}
-			}
+			}			
 			//If all ore < 0.4, follow the crowd
 			if(bestOre <0.4){
+				//also report that we don't have ore where we are at
+				ComSystem.reportUselessMiner();
 				if(rand.nextDouble()<0.5){
 					selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
+					//selected = rc.getLocation().directionTo(rc.senseHQLocation()).opposite();
 				}
 			}
+			
 			//Move to the selected square
 			if(rc.isCoreReady()&&rc.canMove(selected)){
-				rc.move(selected);
+				moveAsCloseToDirection(selected);
 				lastMove = selected;
 				ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 			}

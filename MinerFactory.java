@@ -1,5 +1,6 @@
 package team079;
 
+import team079.util.ComSystem;
 import battlecode.common.*;
 
 public class MinerFactory extends BaseRobot {
@@ -12,7 +13,9 @@ public class MinerFactory extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		spawnUnit(RobotType.MINER);
+		if(ComSystem.getUselessMiners() < 10){
+			spawnUnit(RobotType.MINER);
+		}
 		rc.yield();
 	}
 
