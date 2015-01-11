@@ -50,7 +50,7 @@ public abstract class BaseRobot {
 		}
 	}
 	public void launchAtWeakest() throws GameActionException{
-		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, rc.getTeam().opponent());
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(36, rc.getTeam().opponent());
 		double LowestHealth = 10000;
 		RobotInfo weakestLink = null;
 		for(RobotInfo ri:enemiesInRange){

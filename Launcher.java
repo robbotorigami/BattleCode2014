@@ -18,6 +18,7 @@ public class Launcher extends BaseRobot {
 		//ComSystem.sendLocation(myID+200,rc.getLocation(), true);
 		launchAtWeakest();
 		moveAsCloseToDirection(rc.getLocation().directionTo(ComSystem.getLocation(199)));
+		rc.yield();
 	}
 	
 

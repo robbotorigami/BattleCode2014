@@ -13,9 +13,10 @@ public class Missile extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		// TODO Auto-generated method stub
-
+		explodeWeakest();
+		rc.yield();
 	}
-	public void shootWeakest() throws GameActionException{
+	public void explodeWeakest() throws GameActionException{
 		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, rc.getTeam().opponent());
 		double LowestHealth = 0;
 		RobotInfo weakestLink = null;
