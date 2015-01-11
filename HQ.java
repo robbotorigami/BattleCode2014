@@ -75,7 +75,7 @@ public class HQ extends BaseRobot {
 			total++;
 		}
 		MapLocation center = new MapLocation(sumLocx/total, sumLocy/total);
-		if(sumInRange> 0.7*SWARMAMOUNT && center.distanceSquaredTo(waypoints[currentWaypoint]) < 500){
+		if(sumInRange> 0.7*SWARMAMOUNT){
 			return true;
 		}
 		return false;
