@@ -29,7 +29,7 @@ public class HQ extends BaseRobot {
 		ComSystem.clearMiningInfo();
 		System.out.println("There are " + ComSystem.getUselessMiners() +" Useless Miners ");
 		handleSwarm();
-		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 1){
+		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10){
 			spawnUnit(RobotType.BEAVER);
 		}
 		System.out.println(ComSystem.getMiningLoc());
