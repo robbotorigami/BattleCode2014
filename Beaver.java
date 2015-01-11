@@ -10,7 +10,7 @@ public class Beaver extends BaseRobot {
 	public Beaver(RobotController rcin){
 		super(rcin);
 		rc = rcin;
-		int turnsMoved = 0;
+		turnsMoved = 0;
 		dir = getRandomDirection();
 	}
 	
