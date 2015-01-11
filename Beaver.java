@@ -7,6 +7,7 @@ public class Beaver extends BaseRobot {
 	public RobotController rc;
 	public int turnsMoved;
 	public Direction dir;
+	
 	public Beaver(RobotController rcin){
 		super(rcin);
 		rc = rcin;
@@ -24,7 +25,7 @@ public class Beaver extends BaseRobot {
 		else if(robotsOfTypeOnTeam(RobotType.HELIPAD,rc.getTeam()) <3 && turnsMoved>=6){
 			buildUnit(RobotType.HELIPAD);
 		}
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 3){
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 3 && turnsMoved >=6){
 			
 		}
 		else if(robotsOfTypeOnTeam(RobotType.AEROSPACELAB,rc.getTeam()) < 10 && turnsMoved >=8){
