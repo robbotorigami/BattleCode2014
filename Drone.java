@@ -7,10 +7,11 @@ import battlecode.common.*;
 
 public class Drone extends BaseRobot {
 	public RobotController rc;
+	public boolean supplyingLaunchers;
 	public Drone(RobotController rcin){
 		super(rcin);
 		rc = rcin;
-		public boolean supplyingLaunchers;
+		supplyingLaunchers = 0;
 	}
 
 	@Override
