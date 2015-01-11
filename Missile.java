@@ -17,11 +17,11 @@ public class Missile extends BaseRobot {
 		rc.yield();
 	}
 	public void explodeWeakest() throws GameActionException{
-		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, rc.getTeam().opponent());
-		double LowestHealth = 0;
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(36, rc.getTeam().opponent());
+		double LowestHealth = 10000;
 		RobotInfo weakestLink = null;
 		for(RobotInfo ri:enemiesInRange){
-			if(ri.health>LowestHealth){
+			if(ri.health<LowestHealth){
 				weakestLink = ri;
 				LowestHealth = ri.health;
 			}
