@@ -6,6 +6,7 @@ import battlecode.common.*;
 public class ComSystem {
 	public static RobotController rc;
 	public static final int ORELOG = 100;
+	public static final int USELESSMINERS = 120;
 	private static MapLocation miningLocation;
 	
 	public static void init(RobotController rcin){
@@ -140,7 +141,16 @@ public class ComSystem {
 		if(Clock.getRoundNum()%2 == 0){
 			rc.broadcast(channel, toWrite);
 		}else{
-			rc.broadcast(channel, toWrite);
+			rc.broadcast(channel+1, toWrite);
+		}
+	}
+	
+	private static int readSyncInverted(int channel) throws GameActionException{
+		//If match num is even, use the alt channel
+		if(Clock.getRoundNum()%2 == 0){
+			return rc.readBroadcast(channel);
+		}else{
+			return rc.readBroadcast(channel + 1);
 		}
 	}
 	
@@ -165,5 +175,17 @@ public class ComSystem {
 	public static void clearMiningInfo() throws GameActionException{
 		//Only clear log every ten turns
 		rc.broadcast(ORELOG, 0);
+	}
+	
+	public static void reportUselessMiner() throws GameActionException{
+		writeSync(USELESSMINERS, readSyncInverted(USELESSMINERS)+1);
+	}
+	
+	public static int getUselessMiners() throws GameActionException{
+		return readSync(USELESSMINERS);
+	}
+	
+	public static void clearUselessMiners() throws GameActionException{
+		writeSync(USELESSMINERS, 0);
 	}
 }
