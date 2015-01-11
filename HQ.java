@@ -31,7 +31,10 @@ public class HQ extends BaseRobot {
 		handleSwarm();
 		supplyChain();
 		shootWeakest();
-		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10){
+		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 3){
+			spawnUnit(RobotType.BEAVER);
+		}
+		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10 && rc.getTeamOre() >600){
 			spawnUnit(RobotType.BEAVER);
 		}
 		System.out.println(ComSystem.getMiningLoc());

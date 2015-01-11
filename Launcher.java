@@ -18,7 +18,8 @@ public class Launcher extends BaseRobot {
 		//ComSystem.sendLocation(myID+200,rc.getLocation(), true);
 		launchAtWeakest();
 		supplyChain();
-		basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
+		if(shouldWeMove())
+			basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 		rc.yield();
 	}
 	
@@ -38,6 +39,20 @@ public class Launcher extends BaseRobot {
 			}
 			
 		}
+	}
+	
+	public boolean shouldWeMove(){
+		MapLocation[] towers = rc.senseEnemyTowerLocations();
+		for(MapLocation loc: towers){
+			if(rc.getLocation().distanceSquaredTo(loc) <= 25){
+				return false;
+			}
+		}
+		if(rc.getLocation().distanceSquaredTo(rc.senseEnemyHQLocation()) <= 25){
+			return false;
+		}
+		
+		return true;
 	}
 	
 
