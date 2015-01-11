@@ -40,19 +40,45 @@ public class Launcher extends BaseRobot {
 			
 		}
 	}
-	
-	public boolean shouldWeMove(){
+	public void launchAtWeakest() throws GameActionException{
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(36, rc.getTeam().opponent());
+		double LowestHealth = 10000;
+		RobotInfo weakestLink = null;
+		for(RobotInfo ri:enemiesInRange){
+			if(ri.type == RobotType.TOWER){
+				weakestLink = ri;
+				break;
+			}
+			if(ri.health<LowestHealth && clearPath(rc.getLocation(), ri.location)){
+				weakestLink = ri;
+				LowestHealth = ri.health;
+			}
+			
+		}
+		
+		if(weakestLink != null){
+			if(rc.isWeaponReady()&&rc.canLaunch(rc.getLocation().directionTo(weakestLink.location))&&rc.getMissileCount()>=1){
+				rc.launchMissile(rc.getLocation().directionTo(weakestLink.location));
+			}
+		}
+	}
+	public boolean shouldWeMove() throws GameActionException{
 		MapLocation[] towers = rc.senseEnemyTowerLocations();
+		MapLocation wouldMoveTo = rc.getLocation().add(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 		for(MapLocation loc: towers){
-			if(rc.getLocation().distanceSquaredTo(loc) <= 25){
+			if(wouldMoveTo.distanceSquaredTo(loc) <= RobotType.TOWER.attackRadiusSquared){
 				return false;
 			}
 		}
-		if(rc.getLocation().distanceSquaredTo(rc.senseEnemyHQLocation()) <= 25){
+		if(wouldMoveTo.distanceSquaredTo(rc.senseEnemyHQLocation()) <= RobotType.HQ.attackRadiusSquared){
 			return false;
 		}
-		
-		return true;
+		RobotInfo[] robots = rc.senseNearbyRobots(25, rc.getTeam().opponent());
+		if(robots.length == 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 

@@ -4,10 +4,12 @@ import battlecode.common.*;
 
 public class Missile extends BaseRobot {
 	public RobotController rc;
+	public int turnsWithoutMoving;
 
 	public Missile(RobotController rcin){
 		super(rcin);
 		rc = rcin;
+		turnsWithoutMoving = 0;
 	}
 
 	@Override
@@ -33,11 +35,14 @@ public class Missile extends BaseRobot {
 
 		if(weakestLink != null){
 			if(rc.isCoreReady()){
-				if(rc.canMove(rc.getLocation().directionTo(weakestLink.location))){
-					rc.move(rc.getLocation().directionTo(weakestLink.location));
+				if(basicPathing(rc.getLocation().directionTo(weakestLink.location))){					
+					turnsWithoutMoving = 0;
 				}
 				else{
-					rc.explode();
+					turnsWithoutMoving++;
+					if(turnsWithoutMoving >2){
+						rc.explode();
+					}
 				}
 			}
 		}

@@ -49,28 +49,6 @@ public abstract class BaseRobot {
 			}
 		}
 	}
-	public void launchAtWeakest() throws GameActionException{
-		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(36, rc.getTeam().opponent());
-		double LowestHealth = 10000;
-		RobotInfo weakestLink = null;
-		for(RobotInfo ri:enemiesInRange){
-			if(ri.type == RobotType.TOWER){
-				weakestLink = ri;
-				break;
-			}
-			if(ri.health<LowestHealth){
-				weakestLink = ri;
-				LowestHealth = ri.health;
-			}
-			
-		}
-		
-		if(weakestLink != null){
-			if(rc.isWeaponReady()&&rc.canLaunch(rc.getLocation().directionTo(weakestLink.location))&&rc.getMissileCount()>=1){
-				rc.launchMissile(rc.getLocation().directionTo(weakestLink.location));
-			}
-		}
-	}
 	//Will try to spawn a Unit of a given type
 	public void spawnUnit(RobotType toSpawn) throws GameActionException{
 		if(rc.isCoreReady()){
@@ -202,7 +180,7 @@ public abstract class BaseRobot {
 		return ofType;
 	}
 	
-	public void basicPathing(Direction toMove) throws GameActionException{
+	public boolean basicPathing(Direction toMove) throws GameActionException{
 		if(rc.isCoreReady()){
 			Direction[] toTry = {toMove,
 					toMove.rotateLeft(),
@@ -222,8 +200,21 @@ public abstract class BaseRobot {
 				}
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
 					rc.move(dir);
+					return true;
 				}
 			}
 		}	
+		return false;
+	}
+	
+	public boolean clearPath(MapLocation A, MapLocation B) throws GameActionException{
+		MapLocation toTest = A.add(A.directionTo(B));
+		while(!toTest.equals(B)){
+			if(rc.senseRobotAtLocation(toTest)!= null){
+				return false;
+			}
+			toTest = toTest.add(toTest.directionTo(B));
+		}
+		return true;
 	}
 }

@@ -45,7 +45,7 @@ public class Beaver extends BaseRobot {
 		for(RobotInfo ri: Robots){
 			if(ri.supplyLevel<200){
 				int toSupply = 0;
-				toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
+				toSupply = (int) (Math.abs((rc.getSupplyLevel()-ri.supplyLevel))/2);
 				if(ri.type == RobotType.HQ){
 					toSupply = 0;
 				}
