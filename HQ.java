@@ -11,7 +11,7 @@ public class HQ extends BaseRobot {
 	public final int WAYPOINTDISTANCE = 10;
 	public final int SWARMCHANNEL = 199;
 	public final int SWARMDISTANCE = 10;
-	public final int SWARMAMOUNT = 20;
+	public final int SWARMAMOUNT = 10;
 
 	public HQ(RobotController rcin){
 		super(rcin);
@@ -28,10 +28,7 @@ public class HQ extends BaseRobot {
 		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
 		System.out.println("There are " + ComSystem.getUselessMiners() +" Useless Miners ");
-		if(Clock.getRoundNum()>lastTime+20){
-			//waypoint = waypoint.add(waypoint.directionTo(rc.senseEnemyHQLocation()));
-			//ComSystem.sendLocation(10, waypoint, false);
-		}
+		handleSwarm();
 		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 1){
 			spawnUnit(RobotType.BEAVER);
 		}
@@ -51,7 +48,7 @@ public class HQ extends BaseRobot {
 	
 	public void handleSwarm() throws GameActionException{
 		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam())>SWARMAMOUNT){
-			if(robotsAtWaypoint() && currentWaypoint < (int) (Math.sqrt(rc.getLocation().distanceSquaredTo(rc.senseEnemyHQLocation()))/WAYPOINTDISTANCE)){
+			if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
 				currentWaypoint++;
 			}
 		}
@@ -64,11 +61,13 @@ public class HQ extends BaseRobot {
 		int sumLocy = 0;
 		int total = 0;
 		for(RobotInfo ri: robotsOnTeam(RobotType.LAUNCHER, rc.getTeam())){
+			if(ri == null) break;
 			sumLocx+=ri.location.x;
 			sumLocy+=ri.location.y;
 			if(ri.location.distanceSquaredTo(waypoints[currentWaypoint]) < SWARMDISTANCE){
 				sumInRange++;
 			}
+			total++;
 		}
 		MapLocation center = new MapLocation(sumLocx/total, sumLocy/total);
 		if(sumInRange> 0.8*SWARMAMOUNT && center.distanceSquaredTo(waypoints[currentWaypoint]) < 25){

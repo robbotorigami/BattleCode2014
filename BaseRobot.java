@@ -190,7 +190,7 @@ public abstract class BaseRobot {
 	//Returns an array of RobotInfo of all of the robots that are of a specific type on team
 	public RobotInfo[] robotsOnTeam(RobotType type, Team team){
 		RobotInfo[] Robots = rc.senseNearbyRobots(10000000, team);
-		RobotInfo[] ofType = {};
+		RobotInfo[] ofType = new RobotInfo[100];
 		int index = 0;
 		for(RobotInfo ri:Robots){
 			if(ri.type == type){
@@ -198,6 +198,7 @@ public abstract class BaseRobot {
 				index++;
 			}
 		}
+		
 		return ofType;
 	}
 	
