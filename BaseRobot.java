@@ -11,6 +11,8 @@ public abstract class BaseRobot {
 	public Random rand; //Random number generator
 	public MapLocation theirHQ; //location of their HQ
 	public MapLocation ourHQ; //location of our HQ
+	public MapLocation[] oldLocs;
+	public final int NUMOLDLOCS = 4;
 	
 	public BaseRobot(RobotController rcin){
 		rc = rcin;
@@ -19,6 +21,11 @@ public abstract class BaseRobot {
 		ourHQ = rc.senseHQLocation();
 		theirHQ = rc.senseEnemyHQLocation();
 		BetterMapLocation.init(rc);
+		
+		oldLocs = new MapLocation[NUMOLDLOCS];
+		for(int i =0; i<NUMOLDLOCS; i++){
+			oldLocs[i] = new MapLocation(0,0);
+		}
 	}
 	
 	//Abstract method for major functionality
@@ -192,5 +199,30 @@ public abstract class BaseRobot {
 			}
 		}
 		return ofType;
+	}
+	
+	public void basicPathing(Direction toMove) throws GameActionException{
+		if(rc.isCoreReady()){
+			Direction[] toTry = {toMove,
+					toMove.rotateLeft(),
+					toMove.rotateRight(),
+					toMove.rotateLeft().rotateLeft(),
+					toMove.rotateRight().rotateRight(),
+					toMove.rotateLeft().rotateLeft().rotateLeft(),
+					toMove.rotateRight().rotateRight().rotateRight(),
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
+			};
+			for(Direction dir:toTry){
+				boolean badLoc = false;
+				for(MapLocation oldLoc:oldLocs){
+					if(oldLoc == rc.getLocation().add(dir)){
+						badLoc = true;
+					}
+				}
+				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
+					rc.move(dir);
+				}
+			}
+		}	
 	}
 }
