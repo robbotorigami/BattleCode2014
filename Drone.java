@@ -11,19 +11,19 @@ public class Drone extends BaseRobot {
 	public Drone(RobotController rcin){
 		super(rcin);
 		rc = rcin;
-		supplyingLaunchers = 0;
+		supplyingLaunchers = false;
 	}
 
 	@Override
 	public void run() throws GameActionException {
 		shootWeakest();
-		
+
 		if(supplyingLaunchers){
 			basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 			if(rc.getSupplyLevel()<200){
 				supplyingLaunchers = false;
 			}
-			
+
 		}
 		else{
 			if(rc.getSupplyLevel()>200){
@@ -31,27 +31,26 @@ public class Drone extends BaseRobot {
 			}
 			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
 		}
+
+		rc.yield();
+
+
+
 	}
+	private void supplyLaunchers() throws GameActionException{
+		RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
+		for(RobotInfo ri: Robots){
+			if(ri.type==RobotType.LAUNCHER){
+				int toSupply= (int) rc.getSupplyLevel();
 
-	rc.yield();
-
-
-
-}
-private void supplyLaunchers() throws GameActionException{
-	RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
-	for(RobotInfo ri: Robots){
-		if(ri.type==RobotType.LAUNCHER){
-			int toSupply= (int) rc.getSupplyLevel();
-
-			if(rc.senseRobotAtLocation(ri.location) != null){
-				if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-					rc.transferSupplies(toSupply, ri.location);
+				if(rc.senseRobotAtLocation(ri.location) != null){
+					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+						rc.transferSupplies(toSupply, ri.location);
+					}
 				}
 			}
-		}
 
+		}
 	}
-}
 
 }
