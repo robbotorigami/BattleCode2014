@@ -25,7 +25,23 @@ public abstract class BaseRobot {
 	public abstract void run() throws GameActionException;
 	
 	//-------------------Base Methods for all Units------------------
-	
+	//shoot enemy with lowest HP within range
+	public void shootWeakest() throws GameActionException{
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(rc.getType().attackRadiusSquared, rc.getTeam().opponent());
+		double LowestHealth = 0;
+		RobotInfo weakestLink = null;
+		for(RobotInfo ri:enemiesInRange){
+			if(ri.health>LowestHealth){
+				weakestLink = ri;
+				LowestHealth = ri.health;
+			}
+		}
+		if(weakestLink != null){
+			if(rc.isWeaponReady()&&rc.canAttackLocation(weakestLink.location)){
+				rc.attackLocation(weakestLink.location);
+			}
+		}
+	}
 	//Will try to spawn a Unit of a given type
 	public void spawnUnit(RobotType toSpawn) throws GameActionException{
 		if(rc.isCoreReady()){
