@@ -29,6 +29,8 @@ public class HQ extends BaseRobot {
 		ComSystem.clearMiningInfo();
 		System.out.println("There are " + ComSystem.getUselessMiners() +" Useless Miners ");
 		handleSwarm();
+		supplyChain();
+		shootWeakest();
 		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10){
 			spawnUnit(RobotType.BEAVER);
 		}
@@ -43,7 +45,7 @@ public class HQ extends BaseRobot {
 		for(int i = 0; i<numWaypoints; i++){
 			waypoints[i] = rc.getLocation().add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()), i*WAYPOINTDISTANCE);
 		}
-		currentWaypoint = 0;
+		currentWaypoint = 2;
 	}
 	
 	public void handleSwarm() throws GameActionException{
@@ -74,6 +76,25 @@ public class HQ extends BaseRobot {
 			return true;
 		}
 		return false;
+	}
+	
+	private void supplyChain() throws GameActionException{
+		RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
+		for(RobotInfo ri: Robots){
+			if(ri.supplyLevel<200){
+				int toSupply = 0;
+				toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
+				if(ri.type == RobotType.DRONE){
+					toSupply = (int)rc.getSupplyLevel()/2;
+				}
+				if(rc.senseRobotAtLocation(ri.location) != null){
+					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+						rc.transferSupplies(toSupply, ri.location);
+					}
+				}
+			}
+			
+		}
 	}
 
 }

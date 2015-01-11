@@ -12,7 +12,8 @@ public class Tower extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		// TODO Auto-generated method stub
+		shootWeakest();
+		rc.yield();
 
 	}
 
