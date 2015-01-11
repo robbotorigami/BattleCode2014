@@ -60,14 +60,14 @@ public class Miner extends BaseRobot {
 				//also report that we don't have ore where we are at
 				ComSystem.reportUselessMiner();
 				if(rand.nextDouble()<0.5){
-					selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
-					//selected = rc.getLocation().directionTo(rc.senseHQLocation()).opposite();
+					//selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
+					selected = rc.getLocation().directionTo(rc.senseHQLocation()).opposite();
 				}
 			}
 			
 			//Move to the selected square
 			if(rc.isCoreReady()&&rc.canMove(selected)){
-				moveAsCloseToDirection(selected);
+				basicPathing(selected);
 				lastMove = selected;
 				ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 			}

@@ -25,7 +25,9 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
+		System.out.println("There are " + ComSystem.getUselessMiners() +" Useless Miners ");
 		if(Clock.getRoundNum()>lastTime+20){
 			//waypoint = waypoint.add(waypoint.directionTo(rc.senseEnemyHQLocation()));
 			//ComSystem.sendLocation(10, waypoint, false);
@@ -49,12 +51,15 @@ public class HQ extends BaseRobot {
 	
 	public void handleSwarm() throws GameActionException{
 		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam())>SWARMAMOUNT){
-			//if(robotsAtWaypoint)
+			if(robotsAtWaypoint() && currentWaypoint < (int) (Math.sqrt(rc.getLocation().distanceSquaredTo(rc.senseEnemyHQLocation()))/WAYPOINTDISTANCE)){
+				currentWaypoint++;
+			}
 		}
+		ComSystem.sendLocation(199, waypoints[currentWaypoint], false);
 	}
 	
 	public boolean robotsAtWaypoint(){
-		int sumInRange;
+		int sumInRange = 0;
 		int sumLocx = 0;
 		int sumLocy = 0;
 		int total = 0;
@@ -66,7 +71,10 @@ public class HQ extends BaseRobot {
 			}
 		}
 		MapLocation center = new MapLocation(sumLocx/total, sumLocy/total);
-		//if(sumInRange)
+		if(sumInRange> 0.8*SWARMAMOUNT && center.distanceSquaredTo(waypoints[currentWaypoint]) < 25){
+			return true;
+		}
+		return false;
 	}
 
 }
