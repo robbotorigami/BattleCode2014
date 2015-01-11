@@ -21,6 +21,10 @@ public class Missile extends BaseRobot {
 		double LowestHealth = 10000;
 		RobotInfo weakestLink = null;
 		for(RobotInfo ri:enemiesInRange){
+			if(ri.type == RobotType.TOWER){
+				weakestLink = ri;
+				break;
+			}
 			if(ri.health<LowestHealth){
 				weakestLink = ri;
 				LowestHealth = ri.health;

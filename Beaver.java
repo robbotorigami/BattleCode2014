@@ -21,10 +21,13 @@ public class Beaver extends BaseRobot {
 		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 4 && turnsMoved>=4){
 			buildUnit(RobotType.MINERFACTORY);
 		}
-		else if(robotsOfTypeOnTeam(RobotType.HELIPAD,rc.getTeam()) <1 && turnsMoved>=6){
+		else if(robotsOfTypeOnTeam(RobotType.HELIPAD,rc.getTeam()) <3 && turnsMoved>=6){
 			buildUnit(RobotType.HELIPAD);
 		}
-		else if(robotsOfTypeOnTeam(RobotType.AEROSPACELAB,rc.getTeam()) < 1 && turnsMoved >=8){
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 3){
+			
+		}
+		else if(robotsOfTypeOnTeam(RobotType.AEROSPACELAB,rc.getTeam()) < 10 && turnsMoved >=8){
 			buildUnit(RobotType.AEROSPACELAB);
 		}
 		else if(rc.isCoreReady()){
