@@ -334,4 +334,13 @@ public abstract class BaseRobot {
 		}
 		return true;
 	}
+	
+	public void logAllNearbyOffMap(MapLocation loc) throws GameActionException{
+		MapLocation[] near = MapLocation.getAllMapLocationsWithinRadiusSq(loc, 2);
+		for(MapLocation square: near){
+			if(rc.senseTerrainTile(square) == TerrainTile.OFF_MAP){
+				ComSystem.logOffMap(square);
+			}
+		}
+	}
 }

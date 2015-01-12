@@ -37,7 +37,7 @@ public class Miner extends BaseRobot {
 		//If there is ore, and we aren't blocking miners, mine it!
 		boolean skipSquare = false;
 		if(ComSystem.getUselessMiners()>5){
-			if(Clock.getRoundNum()-roundLastSkipped > 1){
+			if(Clock.getRoundNum()-roundLastSkipped > 50){
 				skipSquare = true;
 				roundLastSkipped = Clock.getRoundNum();
 			}
@@ -46,31 +46,39 @@ public class Miner extends BaseRobot {
 			if(rc.isCoreReady()&&rc.canMine())
 				rc.mine();
 		}else{
+			//also report that we don't have ore where we are at
+			ComSystem.reportUselessMiner();
 			//If there isn't ore, find it!
-			Direction[] toTry = Direction.values();
+			MapLocation[] toTry = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), 2);
 			double bestOre = -1;
 			Direction selected = null;
 			//Find the best square near us
-			for(Direction dir:toTry){
-				if(rc.senseOre(rc.getLocation().add(dir))> bestOre && rc.canMove(dir)){
-					bestOre = rc.senseOre(rc.getLocation().add(dir));
-					selected = dir;
+			for(MapLocation loc:toTry){
+				if(rc.senseOre(loc)> bestOre){
+					bestOre = rc.senseOre(loc);
+					selected = rc.getLocation().directionTo(loc);
 				}
 			}			
 			//If all ore < 0.4, follow the crowd
 			if(bestOre <0.4){
-				//also report that we don't have ore where we are at
-				ComSystem.reportUselessMiner();
-				if(rand.nextDouble()<0.5){
-					//selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
+				
+				if(rand.nextDouble()<0.0){
+					selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
 					//selected = rc.getLocation().directionTo(rc.senseHQLocation()).opposite();
-					selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ),20));
+					//selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ),20));
+				}else{
+					if(rc.getID()%2 == 0)
+						selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ).rotateLeft().rotateLeft(),20));
+					else
+						selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ).rotateRight().rotateRight(),20));
 				}
 			}
 			
 			//Move to the selected square
-			if(rc.isCoreReady()&&rc.canMove(selected)){
-				basicPathing(selected);
+			if(rc.isCoreReady()){
+				if(basicPathing(selected)){
+					ComSystem.logMined(rc.getLocation().add(selected));
+				}
 				lastMove = selected;
 			}
 			

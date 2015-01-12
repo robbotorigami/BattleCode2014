@@ -7,6 +7,7 @@ public class ComSystem {
 	public static RobotController rc;
 	public static final int ORELOG = 100;
 	public static final int USELESSMINERS = 120;
+	public static final int MININGLOCATIONLOG = 10000;
 	private static MapLocation miningLocation;
 	
 	public static void init(RobotController rcin){
@@ -187,5 +188,23 @@ public class ComSystem {
 	
 	public static void clearUselessMiners() throws GameActionException{
 		writeSync(USELESSMINERS, 0);
+	}
+	
+	public static void logMined(MapLocation loc) throws GameActionException{
+		BetterMapLocation betterLoc = new BetterMapLocation(loc);
+		int channel = MININGLOCATIONLOG + 120*betterLoc.x + betterLoc.y;
+		rc.broadcast(channel, 1);
+	}
+	
+	public static void logOffMap(MapLocation loc) throws GameActionException{
+		BetterMapLocation betterLoc = new BetterMapLocation(loc);
+		int channel = MININGLOCATIONLOG + 120*betterLoc.x + betterLoc.y;
+		rc.broadcast(channel, 2);
+	}
+	
+	public static int readMiningSquare(MapLocation loc) throws GameActionException{
+		BetterMapLocation betterLoc = new BetterMapLocation(loc);
+		int channel = MININGLOCATIONLOG + 120*betterLoc.x + betterLoc.y;
+		return rc.readBroadcast(channel);
 	}
 }

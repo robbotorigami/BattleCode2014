@@ -37,7 +37,7 @@ public class Beaver extends BaseRobot {
 		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 3 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.HELIPAD);
 		}
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 3 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 5 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.SUPPLYDEPOT);
 		}
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 4 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
