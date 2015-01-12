@@ -27,6 +27,10 @@ public class Missile extends BaseRobot {
 				weakestLink = ri;
 				break;
 			}
+			if(ri.type == RobotType.HQ){
+				weakestLink = ri;
+				break;
+			}
 			if(ri.health<LowestHealth){
 				weakestLink = ri;
 				LowestHealth = ri.health;
@@ -35,15 +39,10 @@ public class Missile extends BaseRobot {
 
 		if(weakestLink != null){
 			if(rc.isCoreReady()){
-				if(basicPathing(rc.getLocation().directionTo(weakestLink.location))){					
-					turnsWithoutMoving = 0;
+				if(rc.getLocation().isAdjacentTo(weakestLink.location)){
+					//rc.explode();
 				}
-				else{
-					turnsWithoutMoving++;
-					if(turnsWithoutMoving >2){
-						rc.explode();
-					}
-				}
+				moveAsCloseToDirection(rc.getLocation().directionTo(weakestLink.location));
 			}
 		}
 	}

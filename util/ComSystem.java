@@ -158,7 +158,7 @@ public class ComSystem {
 	//Log the location sent if it is a better place to mine
 	public static void logMiningIfBetter(int oreAtLoc, MapLocation loc) throws GameActionException{
 		//Only log every ten turns
-		if(oreAtLoc>rc.readBroadcast(ORELOG)){
+		if(oreAtLoc>=rc.readBroadcast(ORELOG)*.9){
 			rc.broadcast(ORELOG, oreAtLoc);
 			sendLocation(ORELOG+1, loc, false);
 		}

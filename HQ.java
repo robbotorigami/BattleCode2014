@@ -11,7 +11,7 @@ public class HQ extends BaseRobot {
 	public final int WAYPOINTDISTANCE = 10;
 	public final int SWARMCHANNEL = 199;
 	public final int SWARMDISTANCE = 10;
-	public final int SWARMAMOUNT = 1;
+	public final int SWARMAMOUNT = 10;
 
 	public HQ(RobotController rcin){
 		super(rcin);
@@ -91,6 +91,7 @@ public class HQ extends BaseRobot {
 				if(rc.senseRobotAtLocation(ri.location) != null){
 					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
 						rc.transferSupplies(toSupply, ri.location);
+						break;
 					}
 				}
 			}

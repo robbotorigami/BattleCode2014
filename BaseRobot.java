@@ -16,7 +16,7 @@ public abstract class BaseRobot {
 	public Direction lastDir;
 	public Direction lastTried;
 	public boolean useBug;
-	public final int NUMOLDLOCS = 4;
+	public final int NUMOLDLOCS = 10;
 	
 	public BaseRobot(RobotController rcin){
 		rc = rcin;
@@ -44,6 +44,10 @@ public abstract class BaseRobot {
 		double LowestHealth = 0;
 		RobotInfo weakestLink = null;
 		for(RobotInfo ri:enemiesInRange){
+			if(ri.type == RobotType.HQ || ri.type == RobotType.TOWER){
+				weakestLink = ri;
+				break;
+			}
 			if(ri.health>LowestHealth){
 				weakestLink = ri;
 				LowestHealth = ri.health;
@@ -89,25 +93,23 @@ public abstract class BaseRobot {
 	public void buildUnit(RobotType toBuild) throws GameActionException{
 		if(rc.isCoreReady()){
 			boolean unitBuilt = false;
-			while(unitBuilt != true){
-				Direction dir = getRandomDirection();
-				Direction[] toTry = {dir,
-						dir.rotateLeft(),
-						dir.rotateRight(),
-						dir.rotateLeft().rotateLeft(),
-						dir.rotateRight().rotateRight(),
-						dir.rotateLeft().rotateLeft().rotateLeft(),
-						dir.rotateRight().rotateRight().rotateRight(),
-						dir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
-				};
-				for(Direction buildDir: toTry){
-					if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)){			
-						rc.build(buildDir, toBuild);
-						unitBuilt = true;
-						break;
-					}
+			Direction dir = getRandomDirection();
+			Direction[] toTry = {dir,
+					dir.rotateLeft(),
+					dir.rotateRight(),
+					dir.rotateLeft().rotateLeft(),
+					dir.rotateRight().rotateRight(),
+					dir.rotateLeft().rotateLeft().rotateLeft(),
+					dir.rotateRight().rotateRight().rotateRight(),
+					dir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
+			};
+			for(Direction buildDir: toTry){
+				if(toBuild == RobotType.AEROSPACELAB) System.out.println("HEY");
+				if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)){	
+					if(toBuild == RobotType.AEROSPACELAB) System.out.println("LMAO");
+					rc.build(buildDir, toBuild);
+					break;
 				}
-				rc.yield();
 			}
 		}
 	}
@@ -127,6 +129,7 @@ public abstract class BaseRobot {
 			for(Direction dir:toTry){
 				if(rc.canMove(dir)&&rc.isCoreReady()){
 					rc.move(dir);
+					break;
 				}
 			}
 		}		
@@ -188,9 +191,9 @@ public abstract class BaseRobot {
 	
 	public boolean basicPathing(Direction toMove) throws GameActionException{
 		if(rc.isCoreReady()){
-			if(useBug){
+			/*if(useBug){
 				return bugPath(toMove);
-			}
+			}*/
 			Direction[] toTry = {toMove,
 					toMove.rotateLeft(),
 					toMove.rotateRight(),
@@ -205,6 +208,53 @@ public abstract class BaseRobot {
 				if(oldLocs.contains(rc.getLocation().add(dir))){
 					badLoc = true;
 				}
+				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
+					if(dir != toMove){
+						useBug = true;
+					}
+					oldLocs.add(rc.getLocation().add(dir));
+					oldLocs.remove(0);
+					lastDir = dir;
+					lastTried = toMove;
+					rc.move(dir);
+					return true;
+				}
+			}
+		}	
+		return false;
+	}
+	
+	public boolean basicPathingSafe(Direction toMove) throws GameActionException{
+		if(rc.isCoreReady()){
+			/*if(useBug){
+				return bugPath(toMove);
+			}*/
+			Direction[] toTry = {toMove,
+					toMove.rotateLeft(),
+					toMove.rotateRight(),
+					toMove.rotateLeft().rotateLeft(),
+					toMove.rotateRight().rotateRight(),
+					toMove.rotateLeft().rotateLeft().rotateLeft(),
+					toMove.rotateRight().rotateRight().rotateRight(),
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
+			};
+			RobotInfo[] Robots = rc.senseNearbyRobots(40, rc.getTeam().opponent());
+			for(Direction dir:toTry){
+				boolean badLoc = false;
+				if(oldLocs.contains(rc.getLocation().add(dir))){
+					badLoc = true;
+				}
+				for(RobotInfo ri: Robots){
+					if(rc.getLocation().add(dir).distanceSquaredTo(ri.location) <= ri.type.attackRadiusSquared){
+						badLoc = true;
+					}
+				}
+				for(MapLocation loc: rc.senseEnemyTowerLocations()){
+					if(rc.getLocation().add(dir).distanceSquaredTo(loc) <=RobotType.TOWER.attackRadiusSquared){
+						badLoc = true;
+					}
+				}
+				
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
 					if(dir != toMove){
 						useBug = true;
@@ -265,7 +315,6 @@ public abstract class BaseRobot {
 			}
 			if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
 				if(dir == toMove){
-					System.out.println(dir +", " + toMove);
 					useBug = false;
 				}
 				oldLocs.add(rc.getLocation().add(dir));

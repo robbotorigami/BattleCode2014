@@ -12,9 +12,9 @@ public class Helipad extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		if(robotsOfTypeOnTeam(RobotType.DRONE, rc.getTeam())<5){
-		spawnUnit(RobotType.DRONE);
-		
+		if(robotsOfTypeOnTeam(RobotType.DRONE, rc.getTeam()) < 3){
+			spawnUnit(RobotType.DRONE);
+
 		}
 	}
 

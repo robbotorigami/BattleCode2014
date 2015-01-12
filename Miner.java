@@ -20,6 +20,7 @@ public class Miner extends BaseRobot {
 	public void run() throws GameActionException {
 		shootWeakest();
 		mineAndMove();
+		ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 		//updateMiningInfo();
 		rc.yield();
 
@@ -36,7 +37,7 @@ public class Miner extends BaseRobot {
 		//If there is ore, and we aren't blocking miners, mine it!
 		boolean skipSquare = false;
 		if(ComSystem.getUselessMiners()>5){
-			if(Clock.getRoundNum()-roundLastSkipped > 10){
+			if(Clock.getRoundNum()-roundLastSkipped > 1){
 				skipSquare = true;
 				roundLastSkipped = Clock.getRoundNum();
 			}
@@ -62,7 +63,8 @@ public class Miner extends BaseRobot {
 				ComSystem.reportUselessMiner();
 				if(rand.nextDouble()<0.5){
 					//selected = rc.getLocation().directionTo(ComSystem.getMiningLoc());
-					selected = rc.getLocation().directionTo(rc.senseHQLocation()).opposite();
+					//selected = rc.getLocation().directionTo(rc.senseHQLocation()).opposite();
+					selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ),20));
 				}
 			}
 			
@@ -70,7 +72,6 @@ public class Miner extends BaseRobot {
 			if(rc.isCoreReady()&&rc.canMove(selected)){
 				basicPathing(selected);
 				lastMove = selected;
-				ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 			}
 			
 		}

@@ -31,10 +31,12 @@ public class Launcher extends BaseRobot {
 				if(ri.type == RobotType.LAUNCHER){
 					toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
 				}
-				if(rc.senseRobotAtLocation(ri.location) != null){
-					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-						rc.transferSupplies(toSupply, ri.location);
-					}
+				if(ri.type == RobotType.SOLDIER){
+					toSupply = (int) ((rc.getSupplyLevel() - ri.supplyLevel)/4);
+				}
+				if(rc.senseRobotAtLocation(ri.location) != null && toSupply !=0){
+					rc.transferSupplies(toSupply, ri.location);
+					break;
 				}
 			}
 			
@@ -66,14 +68,14 @@ public class Launcher extends BaseRobot {
 		MapLocation[] towers = rc.senseEnemyTowerLocations();
 		MapLocation wouldMoveTo = rc.getLocation().add(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 		for(MapLocation loc: towers){
-			if(wouldMoveTo.distanceSquaredTo(loc) <= RobotType.TOWER.attackRadiusSquared){
+			if(wouldMoveTo.distanceSquaredTo(loc) <= 20){//RobotType.TOWER.attackRadiusSquared){
 				return false;
 			}
 		}
-		if(wouldMoveTo.distanceSquaredTo(rc.senseEnemyHQLocation()) <= RobotType.HQ.attackRadiusSquared){
+		if(wouldMoveTo.distanceSquaredTo(rc.senseEnemyHQLocation()) <= 20){//RobotType.HQ.attackRadiusSquared){
 			return false;
 		}
-		RobotInfo[] robots = rc.senseNearbyRobots(25, rc.getTeam().opponent());
+		RobotInfo[] robots = rc.senseNearbyRobots(wouldMoveTo, 20, rc.getTeam().opponent());
 		if(robots.length == 0){
 			return true;
 		}else{

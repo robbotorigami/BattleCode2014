@@ -1,5 +1,6 @@
 package team079;
 
+import team079.util.ComSystem;
 import battlecode.common.*;
 
 public class Barracks extends BaseRobot {
@@ -12,7 +13,9 @@ public class Barracks extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		// TODO Auto-generated method stub
+		if(robotsOfTypeOnTeam(RobotType.SOLDIER, rc.getTeam()) < 10 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >15 )
+			spawnUnit(RobotType.SOLDIER);
+		rc.yield();
 
 	}
 
