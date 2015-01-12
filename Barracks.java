@@ -13,7 +13,7 @@ public class Barracks extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		if(robotsOfTypeOnTeam(RobotType.SOLDIER, rc.getTeam()) < 10 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >15 )
+		if(robotsOfTypeOnTeam(RobotType.SOLDIER, rc.getTeam()) < 10 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >20 )
 			spawnUnit(RobotType.SOLDIER);
 		rc.yield();
 

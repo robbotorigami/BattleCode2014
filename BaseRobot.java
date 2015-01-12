@@ -104,9 +104,7 @@ public abstract class BaseRobot {
 					dir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
 			};
 			for(Direction buildDir: toTry){
-				if(toBuild == RobotType.AEROSPACELAB) System.out.println("HEY");
 				if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)){	
-					if(toBuild == RobotType.AEROSPACELAB) System.out.println("LMAO");
 					rc.build(buildDir, toBuild);
 					break;
 				}

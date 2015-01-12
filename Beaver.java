@@ -19,13 +19,13 @@ public class Beaver extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		supplyChain();
-		
+
 		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 2*2){
 			buildUnit(RobotType.MINERFACTORY);
-		} else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 3 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
+		} else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
 			buildUnit(RobotType.HELIPAD);
 		}
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 3 && rc.getLocation().distanceSquaredTo(ourHQ) >= 5*5){
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 5*5){
 			buildUnit(RobotType.SUPPLYDEPOT);
 		}
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
@@ -33,6 +33,12 @@ public class Beaver extends BaseRobot {
 		}
 		else if(robotsOfTypeOnTeam(RobotType.AEROSPACELAB,rc.getTeam()) < 4 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.AEROSPACELAB);
+		} 
+		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 3 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
+			buildUnit(RobotType.HELIPAD);
+		}
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 3 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
+			buildUnit(RobotType.SUPPLYDEPOT);
 		}
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 4 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.BARRACKS);

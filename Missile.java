@@ -40,7 +40,7 @@ public class Missile extends BaseRobot {
 		if(weakestLink != null){
 			if(rc.isCoreReady()){
 				if(rc.getLocation().isAdjacentTo(weakestLink.location)){
-					//rc.explode();
+					rc.explode();
 				}
 				moveAsCloseToDirection(rc.getLocation().directionTo(weakestLink.location));
 			}
