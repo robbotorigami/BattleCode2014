@@ -13,6 +13,16 @@ public class Beaver extends BaseRobot {
 		rc = rcin;
 		turnsMoved = 0;
 		dir = getRandomDirection();
+		//DEBUG
+		while(true){
+			try {
+				basicPathing(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
+				rc.setIndicatorString(0, useBug+"");
+			} catch (GameActionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	

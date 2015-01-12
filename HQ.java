@@ -25,9 +25,11 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		//Debug
+		if(Clock.getRoundNum()==300) rc.explode();
+		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) >0)return;
 		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
-		System.out.println("There are " + ComSystem.getUselessMiners() +" Useless Miners ");
 		handleSwarm();
 		supplyChain();
 		shootWeakest();
@@ -37,7 +39,6 @@ public class HQ extends BaseRobot {
 		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10 && rc.getTeamOre() >600){
 			spawnUnit(RobotType.BEAVER);
 		}
-		System.out.println(ComSystem.getMiningLoc());
 		rc.yield();
 	}
 	
