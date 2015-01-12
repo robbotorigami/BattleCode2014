@@ -11,7 +11,7 @@ public class HQ extends BaseRobot {
 	public final int WAYPOINTDISTANCE = 10;
 	public final int SWARMCHANNEL = 199;
 	public final int SWARMDISTANCE = 10;
-	public final int SWARMAMOUNT = 10;
+	public final int SWARMAMOUNT = 1;
 
 	public HQ(RobotController rcin){
 		super(rcin);
@@ -25,9 +25,6 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		//Debug
-		if(Clock.getRoundNum()==300) rc.explode();
-		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) >0)return;
 		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
 		handleSwarm();

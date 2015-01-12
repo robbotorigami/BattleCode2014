@@ -239,7 +239,10 @@ public abstract class BaseRobot {
 					toMove.rotateRight(),
 					toMove.rotateRight().rotateRight(),
 					toMove.rotateRight().rotateRight().rotateRight(),
-					toMove.rotateRight().rotateRight().rotateRight().rotateRight()
+					toMove.rotateRight().rotateRight().rotateRight().rotateRight(),
+					toMove.rotateRight().rotateRight().rotateRight().rotateRight().rotateRight(),
+					toMove.rotateRight().rotateRight().rotateRight().rotateRight().rotateRight().rotateRight(),
+					toMove.rotateRight().rotateRight().rotateRight().rotateRight().rotateRight().rotateRight().rotateRight()
 			};
 			toTry = toTry2;
 		}else{
@@ -248,7 +251,10 @@ public abstract class BaseRobot {
 					toMove.rotateLeft(),
 					toMove.rotateLeft().rotateLeft(),
 					toMove.rotateLeft().rotateLeft().rotateLeft(),
-					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft(),
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft(),
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft(),
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()
 			};
 			toTry = toTry2;
 		}
