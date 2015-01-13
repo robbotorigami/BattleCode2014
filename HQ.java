@@ -50,12 +50,29 @@ public class HQ extends BaseRobot {
 	}
 	
 	public void handleSwarm() throws GameActionException{
-		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam())>SWARMAMOUNT){
-			if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
-				currentWaypoint++;
+		if(Clock.getRoundNum() > 800){
+			if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam())>SWARMAMOUNT){
+				if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
+					currentWaypoint++;
+				}
+			}
+		ComSystem.sendLocation(199, waypoints[currentWaypoint], false);
+		}else {
+			RobotInfo[] drones = robotsOnTeam(RobotType.DRONE, rc.getTeam().opponent());
+			int lowestID = 10000;
+			RobotInfo target = null;
+			for(RobotInfo drone: drones){
+				if(drone != null && drone.ID < lowestID){
+					target = drone;
+					lowestID = drone.ID;
+				}
+			}
+			if(target != null){
+				ComSystem.sendLocation(199, target.location, false);
+			}else{
+				ComSystem.sendLocation(199, waypoints[currentWaypoint], false);
 			}
 		}
-		ComSystem.sendLocation(199, waypoints[currentWaypoint], false);
 	}
 	
 	public boolean robotsAtWaypoint(){

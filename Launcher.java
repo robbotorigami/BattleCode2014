@@ -51,6 +51,10 @@ public class Launcher extends BaseRobot {
 				weakestLink = ri;
 				break;
 			}
+			if(ri.type == RobotType.HQ){
+				weakestLink = ri;
+				break;
+			}
 			if(ri.health<LowestHealth && clearPath(rc.getLocation(), ri.location)){
 				weakestLink = ri;
 				LowestHealth = ri.health;
@@ -72,7 +76,7 @@ public class Launcher extends BaseRobot {
 				return false;
 			}
 		}
-		if(wouldMoveTo.distanceSquaredTo(rc.senseEnemyHQLocation()) <= 20){//RobotType.HQ.attackRadiusSquared){
+		if(wouldMoveTo.distanceSquaredTo(rc.senseEnemyHQLocation()) <= 16){//RobotType.HQ.attackRadiusSquared){
 			return false;
 		}
 		RobotInfo[] robots = rc.senseNearbyRobots(wouldMoveTo, 20, rc.getTeam().opponent());

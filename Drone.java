@@ -34,39 +34,52 @@ public class Drone extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
-		if(!areWeAnnoying){
-			shootWeakest();
-			supplyLaunchers();
-			if(supplyingLaunchers){
-				basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
-				if(rc.getSupplyLevel()<200){
-					supplyingLaunchers = false;				
+		shootWeakest();
+		if(Clock.getRoundNum() > 800){
+			if(!areWeAnnoying){
+				shootWeakest();
+				supplyLaunchers();
+				if(supplyingLaunchers){
+					basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
+					if(rc.getSupplyLevel()<200){
+						supplyingLaunchers = false;				
+					}
+
+				}
+				else{
+					if(rc.getSupplyLevel()>1000){
+						supplyingLaunchers = true;
+					}
+					basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
 				}
 
-			}
-			else{
-				if(rc.getSupplyLevel()>1000){
-					supplyingLaunchers = true;
+				rc.yield();
+			}else{
+				shootWeakest();
+				rc.yield();
+				if(Clock.getRoundNum() <500){
+					dartAway();
+					if(rc.getLocation().distanceSquaredTo(theirHQ)> Math.pow(Math.sqrt(RobotType.HQ.attackRadiusSquared)+1.5, 2))
+						basicPathingSafe(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
+				} else{
+					basicPathing(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
 				}
-				basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
+				rc.yield();
 			}
-
-			rc.yield();
-		}else{
-			shootWeakest();
-			rc.yield();
-			if(Clock.getRoundNum() <500){
-				dartAway();
-				if(rc.getLocation().distanceSquaredTo(theirHQ)> Math.pow(Math.sqrt(RobotType.HQ.attackRadiusSquared)+1.5, 2))
-					basicPathingSafe(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-			} else{
-				basicPathing(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
+		}else {
+			RobotInfo[] drones = robotsOnTeam(RobotType.DRONE, rc.getTeam().opponent());
+			int closest = 1000000000;
+			RobotInfo target = null;
+			for(RobotInfo drone: drones){
+				if(drone != null && drone.location.distanceSquaredTo(rc.getLocation())< closest){
+					target = drone;
+					closest = drone.location.distanceSquaredTo(rc.getLocation());
+				}
 			}
-			rc.yield();
+			if(target != null){
+				basicPathing(rc.getLocation().directionTo(target.location));
+			}
 		}
-
-
-
 	}
 	
 	private void dartAway() throws GameActionException {

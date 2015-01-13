@@ -20,10 +20,14 @@ public class Beaver extends BaseRobot {
 	public void run() throws GameActionException {
 		supplyChain();
 
-		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 2*2){
+		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 2*2){
 			buildUnit(RobotType.MINERFACTORY);
-		} else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
+		} 
+		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
 			buildUnit(RobotType.HELIPAD);
+		}
+		else if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
+			buildUnit(RobotType.MINERFACTORY);
 		}
 		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 5*5){
 			buildUnit(RobotType.SUPPLYDEPOT);
