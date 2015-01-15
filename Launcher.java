@@ -71,6 +71,9 @@ public class Launcher extends BaseRobot {
 	public boolean shouldWeMove() throws GameActionException{
 		MapLocation[] towers = rc.senseEnemyTowerLocations();
 		MapLocation wouldMoveTo = rc.getLocation().add(rc.getLocation().directionTo(ComSystem.getLocation(199)));
+		if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 4){
+			return false;
+		}
 		for(MapLocation loc: towers){
 			if(wouldMoveTo.distanceSquaredTo(loc) <= 20){//RobotType.TOWER.attackRadiusSquared){
 				return false;

@@ -10,6 +10,7 @@ public class Drone extends BaseRobot {
 	public boolean supplyingLaunchers;
 	public boolean areWeAnnoying;
 	public boolean areWeMeanderer;
+	public MapLocation center;
 	public enum ID{
 		SCOUTING,FIND_WAYPOINT,
 		SUPPLY_MINERS,SUPPLY_LAUNCHERS,
@@ -37,6 +38,7 @@ public class Drone extends BaseRobot {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		center = new MapLocation(0,0);
 	}
 
 	@Override
@@ -65,7 +67,20 @@ public class Drone extends BaseRobot {
 				shootWeakest();
 				supplyLaunchers();
 				if(supplyingLaunchers){
-					basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
+					int sumLocx = 0;
+					int sumLocy = 0;
+					int total = 0;
+					for(RobotInfo ri: robotsOnTeam(RobotType.LAUNCHER, rc.getTeam())){
+						if(ri == null) break;
+						if(ri.location.distanceSquaredTo(ComSystem.getLocation(199)) < 40){
+							sumLocx+=ri.location.x;
+							sumLocy+=ri.location.y;
+							total++;
+						}
+					}
+					if(total != 0)
+						center = new MapLocation(sumLocx/total, sumLocy/total);
+					basicPathing(rc.getLocation().directionTo(center));
 					if(rc.getSupplyLevel()<200){
 						supplyingLaunchers = false;				
 					}
@@ -152,7 +167,7 @@ public class Drone extends BaseRobot {
 		for(RobotInfo ri: Robots){
 			if(ri.type==RobotType.LAUNCHER || ri.type == RobotType.SOLDIER){
 				int toSupply = 0;
-				if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199))<40){
+				if(rc.getLocation().distanceSquaredTo(center)<40){
 					toSupply= Math.max((int) rc.getSupplyLevel() - 150,0);
 				}else{
 					toSupply = (int) Math.max(Math.min(rc.getSupplyLevel(),100) - 150,0);

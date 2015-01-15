@@ -8,7 +8,7 @@ public class HQ extends BaseRobot {
 	public int lastTime;
 	public MapLocation[] waypoints;
 	public int currentWaypoint;
-	public final int WAYPOINTDISTANCE = 10;
+	public final int WAYPOINTMAXDISTANCE = 10;
 	public final int SWARMCHANNEL = 199;
 	public final int SWARMDISTANCE = 10;
 	public final int SWARMAMOUNT = 10;
@@ -40,13 +40,12 @@ public class HQ extends BaseRobot {
 	}
 	
 	public void initSwarm()throws GameActionException{
-		int numWaypoints = (int) (Math.sqrt(rc.getLocation().distanceSquaredTo(rc.senseEnemyHQLocation()))/WAYPOINTDISTANCE);
+		int actWaypointDis = (int) Math.min(Math.sqrt(rc.getLocation().distanceSquaredTo(rc.senseEnemyHQLocation()))/2,WAYPOINTMAXDISTANCE);
+		int numWaypoints = 2;
 		waypoints = new MapLocation[numWaypoints];
-		
-		for(int i = 0; i<numWaypoints; i++){
-			waypoints[i] = rc.getLocation().add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()), i*WAYPOINTDISTANCE);
-		}
-		currentWaypoint = 1;
+		waypoints[0] = rc.getLocation().add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()), actWaypointDis);
+		waypoints[1] = rc.senseEnemyHQLocation();
+		currentWaypoint = 0;
 	}
 	
 	public void handleSwarm() throws GameActionException{
@@ -56,8 +55,8 @@ public class HQ extends BaseRobot {
 					currentWaypoint++;
 				}
 			}
-		ComSystem.sendLocation(199, waypoints[currentWaypoint], false);
-		}else {
+			ComSystem.sendLocation(199, waypoints[currentWaypoint], false);
+		}else{
 			RobotInfo[] drones = robotsOnTeam(RobotType.DRONE, rc.getTeam().opponent());
 			int lowestID = 10000;
 			RobotInfo target = null;
@@ -74,7 +73,7 @@ public class HQ extends BaseRobot {
 			}
 		}
 	}
-	
+
 	public boolean robotsAtWaypoint(){
 		int sumInRange = 0;
 		int sumLocx = 0;
