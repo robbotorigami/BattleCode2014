@@ -1,6 +1,7 @@
 package testplayer1;
 
 import java.util.Random;
+
 import battlecode.common.*;
 
 public class RobotPlayer {
@@ -33,8 +34,8 @@ public class RobotPlayer {
 						moveAsCloseToDirectionSafe(toBoldlyGo);
 					}else{
 						if(randall.nextDouble()<0.05){
-							if(robotsOfTypeOnTeam(RobotType.MINERFACTORY, rc.getTeam())<4){
-								buildUnit(RobotType.MINERFACTORY);
+							if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam())<4){
+								buildUnit(RobotType.HELIPAD);
 							}else if(robotsOfTypeOnTeam(RobotType.BARRACKS, rc.getTeam())<3){
 								buildUnit(RobotType.BARRACKS);
 							}else if(robotsOfTypeOnTeam(RobotType.TANKFACTORY, rc.getTeam())<2){
@@ -70,6 +71,10 @@ public class RobotPlayer {
 				case TANK:
 					shootWeakest();
 					moveAsCloseToDirection(rc.getLocation().directionTo(rc.senseEnemyTowerLocations()[0]));
+				case HELIPAD:
+					spawnUnit(RobotType.DRONE);
+				case DRONE:
+					scanPath();
 				}
 			}catch(GameActionException e){
 				e.printStackTrace();
@@ -77,23 +82,9 @@ public class RobotPlayer {
 			rc.yield();
 		}
 	}
-	private static void supplyChain() throws GameActionException{
-		RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
-		for(RobotInfo ri: Robots){
-			if(ri.supplyLevel<rc.getSupplyLevel()/2){
-				int toSupply = 0;
-				if(ri.type==RobotType.BEAVER){
-					toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/4);
-				}else{
-					toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
-				}
-				if(rc.senseRobotAtLocation(ri.location) != null){
-					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-						rc.transferSupplies(toSupply, ri.location);
-					}
-				}
-			}
-		}
+	private static void supplyChain() {
+		// TODO Auto-generated method stub
+		
 	}
 	private static int robotsOfTypeOnTeam(RobotType type, Team team) {
 		RobotInfo[] Robots = rc.senseNearbyRobots(1000000, team);
@@ -218,5 +209,33 @@ public class RobotPlayer {
 		}
 		return safe;
 	}
+	
+	public static void scanPath() throws GameActionException{
+		int i = 1;
+		MapLocation target = null;
+		while(true){
+			MapLocation[] nearby = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), i*i);
+			for(MapLocation near: nearby){
+				if(rc.senseTerrainTile(near) == TerrainTile.UNKNOWN && rc.senseTerrainTile(near) != TerrainTile.OFF_MAP){
+					target = near;
+				}
+			}
+			if(target != null){
+				break;
+			}
+			i++;
+		}
+		pathToLocation(target, 2);
+	}
+	
+	private static void pathToLocation(MapLocation target, int threshold) throws GameActionException {
+		while(rc.getLocation().distanceSquaredTo(target)>threshold){
+			moveAsCloseToDirection(rc.getLocation().directionTo(target));
+			rc.yield();
+		}
+		
+	}
+	
+	
 
 }
