@@ -10,10 +10,17 @@ public class Drone extends BaseRobot {
 	public boolean supplyingLaunchers;
 	public boolean areWeAnnoying;
 	public boolean areWeMeanderer;
+	public enum ID{
+		SCOUTING,FIND_WAYPOINT,
+		SUPPLY_MINERS,SUPPLY_LAUNCHERS,
+		HARASS
+	}
+	public ID myID;
 	public Drone(RobotController rcin){
 		super(rcin);
 		rc = rcin;
-		supplyingLaunchers = false;
+		supplyingLaunchers = false; 
+		myID = ID.SCOUTING;
 		try {
 			rc.broadcast(2099, rc.readBroadcast(2099)+1);
 			areWeAnnoying = rc.readBroadcast(2099) <15;
@@ -34,6 +41,24 @@ public class Drone extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
+		switch(myID){
+		case SCOUTING:
+			scoutMap();
+			break;
+		case FIND_WAYPOINT:
+			findWaypoint();
+			break;
+		case SUPPLY_MINERS:
+			supplyMiners();
+			break;
+		case SUPPLY_LAUNCHERS:
+			supplyTheLaunchers();
+			break;
+		case HARASS:
+			harass();
+			break;
+		}
+		
 		shootWeakest();
 		if(Clock.getRoundNum() > 800){
 			if(!areWeAnnoying){
@@ -82,6 +107,36 @@ public class Drone extends BaseRobot {
 		}
 	}
 	
+	private void harass() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void supplyTheLaunchers() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void supplyMiners() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void findWaypoint() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@SuppressWarnings("unused")
+	private void scoutMap() {
+		if(false) //if(ComSytem.pathingDone() && numOfDronesOfType(ID.FIND_WAYPOINT) < 1)
+		{
+			myID = ID.FIND_WAYPOINT;	
+		}
+		
+		
+	}
+
 	private void dartAway() throws GameActionException {
 		RobotInfo[] Robots = rc.senseNearbyRobots(30, rc.getTeam().opponent());
 		for(RobotInfo ri: Robots){
