@@ -1,5 +1,6 @@
 package team079.util;
 
+import team079.Drone;
 import battlecode.common.*;
 
 //Basic ComSystem package, to keep the communication system working well
@@ -8,6 +9,11 @@ public class ComSystem {
 	public static final int ORELOG = 100;
 	public static final int USELESSMINERS = 120;
 	public static final int MININGLOCATIONLOG = 10000;
+	public static final int COUNTERDRONESCOUTING = 5000;
+	public static final int COUNTERDRONEFIND_WAYPOINT = 5002;
+	public static final int COUNTERDRONESUPPLYMINER = 5004;
+	public static final int COUNTERDRONESUPPLYLAUNCHER = 5006;
+	public static final int COUNTERDRONEHARASS = 5008;
 	private static MapLocation miningLocation;
 	
 	public static void init(RobotController rcin){
@@ -155,6 +161,16 @@ public class ComSystem {
 		}
 	}
 	
+	//Increment the specified synced channel
+	private static int incSync(int channel) throws GameActionException{
+		writeSync(channel, readSyncInverted(channel)+1);
+	}
+	
+	//Set the specified channel to zero
+	private static int clearSync(int channel) throws GameActionException{
+		writeSync(channel, 0);
+	}
+	
 	//-------------------Mining Communication Methods------------------------------
 	//Log the location sent if it is a better place to mine
 	public static void logMiningIfBetter(int oreAtLoc, MapLocation loc) throws GameActionException{
@@ -206,5 +222,44 @@ public class ComSystem {
 		BetterMapLocation betterLoc = new BetterMapLocation(loc);
 		int channel = MININGLOCATIONLOG + 120*betterLoc.x + betterLoc.y;
 		return rc.readBroadcast(channel);
+	}
+	
+	//-------------------------Code for the drones--------------------------------
+	public static void handleDroneID(Drone.ID DroneID){
+		switch(DroneID){
+		case SCOUTING:
+			incSync(COUNTERDRONESCOUTING);
+		case FIND_WAYPOINT:
+			incSync(COUNTERDRONEFIND_WAYPOINT);
+		case SUPPLYMINER:
+			incSync(COUNTERDRONESUPPLYMINER);
+		case SUPPLYLAUNCHER:
+			incSync(COUNTERDRONESUPPLYLAUNCHER);
+		case HARASS;
+			incSync(COUNTERDRONEHARASS);
+		}		
+	}
+	
+	public static void clearAllDrones(){
+		clearSync(COUNTERDRONESCOUTING);
+		clearSync(COUNTERDRONEFIND_WAYPOINT);
+		clearSync(COUNTERDRONESUPPLYMINER);
+		clearSync(COUNTERDRONESUPPLYLAUNCHER);
+		clearSync(COUNTERDRONEHARASS);
+	}
+	
+	public static int numOfDronesOfType(Drone.ID ID){
+		switch(DroneID){
+		case SCOUTING:
+			readSync(COUNTERDRONESCOUTING);
+		case FIND_WAYPOINT:
+			readSync(COUNTERDRONEFIND_WAYPOINT);
+		case SUPPLYMINER:
+			readSync(COUNTERDRONESUPPLYMINER);
+		case SUPPLYLAUNCHER:
+			readSync(COUNTERDRONESUPPLYLAUNCHER);
+		case HARASS;
+			sreadSync(COUNTERDRONEHARASS);
+		}
 	}
 }
