@@ -30,7 +30,7 @@ public class Drone extends BaseRobot {
 			e.printStackTrace();
 		}
 		areWeAnnoying =false;
-		
+
 		try {
 			rc.broadcast(2990, rc.readBroadcast(2990)+1);
 			areWeMeanderer = rc.readBroadcast(2990) <=1;
@@ -60,7 +60,7 @@ public class Drone extends BaseRobot {
 			harass();
 			break;
 		}
-		
+
 		shootWeakest();
 		if(Clock.getRoundNum() > 800){
 			if(!areWeAnnoying){
@@ -121,25 +121,21 @@ public class Drone extends BaseRobot {
 			}
 		}
 	}
-	
+
 	private void harass() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void supplyTheLaunchers() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	private void supplyMiners() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	private void findWaypoint() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@SuppressWarnings("unused")
@@ -148,9 +144,38 @@ public class Drone extends BaseRobot {
 		{
 			myID = ID.FIND_WAYPOINT;	
 		}
-		
-		
+
+
 	}
+	private void supplyMiners() throws GameActionException {
+		RobotInfo[] miners = robotsOnTeam(RobotType.MINER, rc.getTeam());
+		for(RobotInfo ri: miners){
+			int toSupply = 0;
+			toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+			if(rc.senseRobotAtLocation(ri.location) != null){
+				if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+					
+					if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
+							rc.transferSupplies(toSupply, ri.location);
+							break;
+					}
+					
+				}
+
+			}
+			if(rc.getSupplyLevel() > 250){
+				if(ri.supplyLevel < 50){
+					basicPathing(rc.getLocation().directionTo(ri.location));
+					break;
+				}
+			}else{
+				basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
+			}	
+
+		}
+
+	}
+
 
 	private void dartAway() throws GameActionException {
 		RobotInfo[] Robots = rc.senseNearbyRobots(30, rc.getTeam().opponent());
@@ -159,7 +184,7 @@ public class Drone extends BaseRobot {
 				moveAsCloseToDirection(ri.location.directionTo(rc.getLocation()));
 			}
 		}
-		
+
 	}
 
 	private void supplyLaunchers() throws GameActionException{
@@ -170,7 +195,7 @@ public class Drone extends BaseRobot {
 				if(rc.getLocation().distanceSquaredTo(center)<40){
 					toSupply= Math.max((int) rc.getSupplyLevel() - 150,0);
 				}else{
-					toSupply = (int) Math.max(Math.min(rc.getSupplyLevel(),100) - 150,0);
+					toSupply = (int) Math.max(Math.min(rc.getSupplyLevel(),200) - 150,0);
 				}
 
 				if(rc.senseRobotAtLocation(ri.location) != null){
