@@ -162,12 +162,12 @@ public class ComSystem {
 	}
 	
 	//Increment the specified synced channel
-	private static int incSync(int channel) throws GameActionException{
+	private static void incSync(int channel) throws GameActionException{
 		writeSync(channel, readSyncInverted(channel)+1);
 	}
 	
 	//Set the specified channel to zero
-	private static int clearSync(int channel) throws GameActionException{
+	private static void clearSync(int channel) throws GameActionException{
 		writeSync(channel, 0);
 	}
 	
@@ -225,22 +225,27 @@ public class ComSystem {
 	}
 	
 	//-------------------------Code for the drones--------------------------------
-	public static void handleDroneID(Drone.ID DroneID){
+	public static void handleDroneID(Drone.ID DroneID) throws GameActionException{
 		switch(DroneID){
 		case SCOUTING:
 			incSync(COUNTERDRONESCOUTING);
+			break;
 		case FIND_WAYPOINT:
 			incSync(COUNTERDRONEFIND_WAYPOINT);
-		case SUPPLYMINER:
+			break;
+		case SUPPLY_MINERS:
 			incSync(COUNTERDRONESUPPLYMINER);
-		case SUPPLYLAUNCHER:
+			break;
+		case SUPPLY_LAUNCHERS:
 			incSync(COUNTERDRONESUPPLYLAUNCHER);
-		case HARASS;
+			break;
+		case HARASS:
 			incSync(COUNTERDRONEHARASS);
+			break;
 		}		
 	}
 	
-	public static void clearAllDrones(){
+	public static void clearAllDrones() throws GameActionException{
 		clearSync(COUNTERDRONESCOUTING);
 		clearSync(COUNTERDRONEFIND_WAYPOINT);
 		clearSync(COUNTERDRONESUPPLYMINER);
@@ -248,18 +253,19 @@ public class ComSystem {
 		clearSync(COUNTERDRONEHARASS);
 	}
 	
-	public static int numOfDronesOfType(Drone.ID ID){
-		switch(DroneID){
+	public static int numOfDronesOfType(Drone.ID ID) throws GameActionException{
+		switch(ID){
 		case SCOUTING:
-			readSync(COUNTERDRONESCOUTING);
+			return readSync(COUNTERDRONESCOUTING);
 		case FIND_WAYPOINT:
-			readSync(COUNTERDRONEFIND_WAYPOINT);
-		case SUPPLYMINER:
-			readSync(COUNTERDRONESUPPLYMINER);
-		case SUPPLYLAUNCHER:
-			readSync(COUNTERDRONESUPPLYLAUNCHER);
-		case HARASS;
-			sreadSync(COUNTERDRONEHARASS);
+			return readSync(COUNTERDRONEFIND_WAYPOINT);
+		case SUPPLY_MINERS:
+			return readSync(COUNTERDRONESUPPLYMINER);
+		case SUPPLY_LAUNCHERS:
+			return readSync(COUNTERDRONESUPPLYLAUNCHER);
+		case HARASS:
+			return readSync(COUNTERDRONEHARASS);
 		}
+		return 0;
 	}
 }
