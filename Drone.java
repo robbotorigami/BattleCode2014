@@ -7,7 +7,7 @@ import battlecode.common.*;
 
 public class Drone extends BaseRobot {
 	public RobotController rc;
-	public boolean supplyingLaunchers;
+	public boolean supplying;
 	public boolean areWeAnnoying;
 	public boolean areWeMeanderer;
 	public MapLocation center;
@@ -20,6 +20,7 @@ public class Drone extends BaseRobot {
 	public Drone(RobotController rcin){
 		super(rcin);
 		rc = rcin; 
+		supplying = false; 
 		myID = ID.SCOUTING;
 		try {
 			rc.broadcast(2099, rc.readBroadcast(2099)+1);
@@ -60,67 +61,6 @@ public class Drone extends BaseRobot {
 			break;
 		}
 	}
-
-
-		/*if(Clock.getRoundNum() > 800){
-			if(!areWeAnnoying){
-				shootWeakest();
-				supplyLaunchers();
-				if(supplyingLaunchers){
-					int sumLocx = 0;
-					int sumLocy = 0;
-					int total = 0;
-					for(RobotInfo ri: robotsOnTeam(RobotType.LAUNCHER, rc.getTeam())){
-						if(ri == null) break;
-						if(ri.location.distanceSquaredTo(ComSystem.getLocation(199)) < 40){
-							sumLocx+=ri.location.x;
-							sumLocy+=ri.location.y;
-							total++;
-						}
-					}
-					if(total != 0)
-						center = new MapLocation(sumLocx/total, sumLocy/total);
-					basicPathing(rc.getLocation().directionTo(center));
-					if(rc.getSupplyLevel()<200){
-						supplyingLaunchers = false;				
-					}
-
-				}
-				else{
-					if(rc.getSupplyLevel()>1000){
-						supplyingLaunchers = true;
-					}
-					basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
-				}
-
-				rc.yield();
-			}else{
-				shootWeakest();
-				rc.yield();
-				if(Clock.getRoundNum() <500){
-					dartAway();
-					if(rc.getLocation().distanceSquaredTo(theirHQ)> Math.pow(Math.sqrt(RobotType.HQ.attackRadiusSquared)+1.5, 2))
-						basicPathingSafe(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-				} else{
-					basicPathing(rc.getLocation().directionTo(rc.senseEnemyHQLocation()));
-				}
-				rc.yield();
-			}
-		}if(Clock.getRoundNum() < 800) {
-			RobotInfo[] drones = robotsOnTeam(RobotType.DRONE, rc.getTeam().opponent());
-			int closest = 1000000000;
-			RobotInfo target = null;
-			for(RobotInfo drone: drones){
-				if(drone != null && drone.location.distanceSquaredTo(rc.getLocation())< closest){
-					target = drone;
-					closest = drone.location.distanceSquaredTo(rc.getLocation());
-				}
-			}
-			if(target != null){
-				basicPathing(rc.getLocation().directionTo(target.location));
-			}
-			rc.yield();
-		}*/
 	
 
 	private void harass() {
@@ -130,7 +70,7 @@ public class Drone extends BaseRobot {
 
 	private void supplyTheLaunchers() throws GameActionException {
 		RobotInfo[] launchers = robotsOnTeam(RobotType.LAUNCHER, rc.getTeam());
-		if(rc.getSupplyLevel() > 250){
+		if(rc.getSupplyLevel() > 1000){
 			for(RobotInfo ri: launchers){
 				int toSupply = 0;
 				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
@@ -146,12 +86,12 @@ public class Drone extends BaseRobot {
 
 				}
 				if(ri.supplyLevel < 1000){
-					basicPathing(rc.getLocation().directionTo(ri.location));
+					basicPathingSafe(rc.getLocation().directionTo(ri.location));
 					break;
 				}
 			}
 		}else{
-			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
+			basicPathingSafe(rc.getLocation().directionTo(rc.senseHQLocation()));
 		}	
 		rc.yield();
 
@@ -175,32 +115,34 @@ public class Drone extends BaseRobot {
 	}
 	private void supplyMiners() throws GameActionException {
 		RobotInfo[] miners = robotsOnTeam(RobotType.MINER, rc.getTeam());
-		for(RobotInfo ri: miners){
-			int toSupply = 0;
-			toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
-			if(rc.senseRobotAtLocation(ri.location) != null){
-				if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-					
-					if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
+		if(rc.getSupplyLevel() > 1000){
+			for(RobotInfo ri: miners){
+				int toSupply = 0;
+				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+				if(rc.senseRobotAtLocation(ri.location) != null){
+					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+
+						if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
 							rc.transferSupplies(toSupply, ri.location);
 							break;
+						}
+
 					}
-					
+
 				}
 
-			}
-			if(rc.getSupplyLevel() > 250){
 				if(ri.supplyLevel < 50){
 					basicPathing(rc.getLocation().directionTo(ri.location));
 					break;
 				}
-			}else{
-				basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
-			}	
 
+
+			}
+		}else{
+			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
 		}
 		rc.yield();
-		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >4){
+		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >4 && ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS) <5){
 			myID = ID.SUPPLY_LAUNCHERS;
 			
 		}
@@ -208,36 +150,6 @@ public class Drone extends BaseRobot {
 	}
 
 
-	/*private void dartAway() throws GameActionException {
-		RobotInfo[] Robots = rc.senseNearbyRobots(30, rc.getTeam().opponent());
-		for(RobotInfo ri: Robots){
-			if(rc.getLocation().distanceSquaredTo(ri.location) <= ri.type.attackRadiusSquared){
-				moveAsCloseToDirection(ri.location.directionTo(rc.getLocation()));
-			}
-		}
-
-	}*/
-
-	/*private void supplyLaunchers() throws GameActionException{
-		RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
-		for(RobotInfo ri: Robots){
-			if(ri.type==RobotType.LAUNCHER || ri.type == RobotType.SOLDIER){
-				int toSupply = 0;
-				if(rc.getLocation().distanceSquaredTo(center)<40){
-					toSupply= Math.max((int) rc.getSupplyLevel() - 150,0);
-				}else{
-					toSupply = (int) Math.max(Math.min(rc.getSupplyLevel(),200) - 150,0);
-				}
-
-				if(rc.senseRobotAtLocation(ri.location) != null){
-					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-						rc.transferSupplies(toSupply, ri.location);
-						break;
-					}
-				}
-			}
-
-		}
-	}*/
+	
 
 }
