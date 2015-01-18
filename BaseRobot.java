@@ -29,21 +29,23 @@ public abstract class BaseRobot {
 	
 	public BaseRobot(RobotController rcin){
 		rc = rcin;
-		rand = new Random(rc.getID());
-		ComSystem.init(rc);
-		ourHQ = rc.senseHQLocation();
-		theirHQ = rc.senseEnemyHQLocation();
-		BetterMapLocation.init(rc);
-		
-		oldLocs = new ArrayList();
-		for(int i =0; i<NUMOLDLOCS; i++){
-			oldLocs.add(new MapLocation(0,0));
+		if(rc.getType() != RobotType.MISSILE){
+			rand = new Random(rc.getID());
+			ComSystem.init(rc);
+			ourHQ = rc.senseHQLocation();
+			theirHQ = rc.senseEnemyHQLocation();
+			BetterMapLocation.init(rc);
+
+			oldLocs = new ArrayList();
+			for(int i =0; i<NUMOLDLOCS; i++){
+				oldLocs.add(new MapLocation(0,0));
+			}
+			lastDir = Direction.NORTH;
+			useBug = false;
+			bugPathing = new BugInfo();
 		}
-		lastDir = Direction.NORTH;
-		useBug = false;
-		bugPathing = new BugInfo();
 	}
-	
+
 	//Abstract method for major functionality
 	public abstract void run() throws GameActionException;
 	
@@ -114,9 +116,12 @@ public abstract class BaseRobot {
 					dir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
 			};
 			for(Direction buildDir: toTry){
-				if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)){	
-					rc.build(buildDir, toBuild);
-					break;
+				BetterMapLocation wouldBeBuilt = new BetterMapLocation(rc.getLocation().add(buildDir));
+				if(wouldBeBuilt.x%2 == wouldBeBuilt.y%2){
+					if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)){	
+						rc.build(buildDir, toBuild);
+						break;
+					}
 				}
 			}
 		}
@@ -186,7 +191,7 @@ public abstract class BaseRobot {
 	//Returns an array of RobotInfo of all of the robots that are of a specific type on team
 	public RobotInfo[] robotsOnTeam(RobotType type, Team team){
 		RobotInfo[] Robots = rc.senseNearbyRobots(10000000, team);
-		RobotInfo[] ofType = new RobotInfo[100];
+		RobotInfo[] ofType = new RobotInfo[1000];
 		int index = 0;
 		for(RobotInfo ri:Robots){
 			if(ri.type == type){
@@ -194,8 +199,12 @@ public abstract class BaseRobot {
 				index++;
 			}
 		}
+		RobotInfo[] fixyfix = new RobotInfo[index];
+		for(int i = 0; i<index; i++){
+			fixyfix[i] = ofType[i];
+		}
 		
-		return ofType;
+		return fixyfix;
 	}
 	
 	public boolean basicPathing(Direction toMove) throws GameActionException{

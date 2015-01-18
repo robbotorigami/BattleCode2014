@@ -28,10 +28,10 @@ public class Beaver extends BaseRobot {
 		}
 		else if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
 			buildUnit(RobotType.MINERFACTORY);
-		}/*
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 5*5){
-			buildUnit(RobotType.SUPPLYDEPOT);
 		}
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 4 && rc.getLocation().distanceSquaredTo(ourHQ) >= 5*5){
+			buildUnit(RobotType.SUPPLYDEPOT);
+		}/*
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.BARRACKS);
 		}*/
@@ -41,7 +41,7 @@ public class Beaver extends BaseRobot {
 		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.HELIPAD);
 		}
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 5 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 6){
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 10 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 6){
 			buildUnit(RobotType.SUPPLYDEPOT);
 		}
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 6){

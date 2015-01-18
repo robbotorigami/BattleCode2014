@@ -39,6 +39,9 @@ public class Missile extends BaseRobot {
 
 		if(weakestLink != null){
 			if(rc.isCoreReady()){
+				if(rc.getHealth() <=1 && rc.senseNearbyRobots(2,rc.getTeam().opponent()).length >0){
+					rc.explode();
+				}
 				if(rc.getLocation().isAdjacentTo(weakestLink.location)){
 					rc.explode();
 				}
