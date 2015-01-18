@@ -13,6 +13,9 @@ public class Soldier extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		betterPathing(rc.senseEnemyHQLocation()); 
+		rc.yield();
+		if(true)return;
 		shootWeakest();
 		supplyChain();
 		basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199).add(ourHQ.directionTo(theirHQ),3)));

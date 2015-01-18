@@ -17,6 +17,15 @@ public abstract class BaseRobot {
 	public Direction lastTried;
 	public boolean useBug;
 	public final int NUMOLDLOCS = 10;
+	public BugInfo bugPathing;
+	
+	public class BugInfo{
+		public boolean wallFollow;
+		public MapLocation from;
+		public int dmin;
+		public int dleave;
+		
+	}
 	
 	public BaseRobot(RobotController rcin){
 		rc = rcin;
@@ -32,6 +41,7 @@ public abstract class BaseRobot {
 		}
 		lastDir = Direction.NORTH;
 		useBug = false;
+		bugPathing = new BugInfo();
 	}
 	
 	//Abstract method for major functionality
@@ -113,7 +123,7 @@ public abstract class BaseRobot {
 	}
 	
 	//Move as close as possible to the provided direction
-	public void moveAsCloseToDirection(Direction toMove) throws GameActionException{
+	public boolean moveAsCloseToDirection(Direction toMove) throws GameActionException{
 		if(rc.isCoreReady()){
 			Direction[] toTry = {toMove,
 					toMove.rotateLeft(),
@@ -127,10 +137,11 @@ public abstract class BaseRobot {
 			for(Direction dir:toTry){
 				if(rc.canMove(dir)&&rc.isCoreReady()){
 					rc.move(dir);
-					break;
+					return true;
 				}
 			}
-		}		
+		}	
+		return false;
 	}
 	
 	//Returns a random direction	
@@ -324,6 +335,118 @@ public abstract class BaseRobot {
 		return false;
 	}
 	
+	public void initBetterPathing(MapLocation from){
+		bugPathing.from = from;
+	}
+	
+	public boolean betterPathing(MapLocation toPathTo) throws GameActionException{
+		rc.setIndicatorString(0, "");
+		rc.setIndicatorString(1, "");
+		Direction dir = rc.getLocation().directionTo(toPathTo);
+		MapLocation check = rc.getLocation().add(dir);
+		boolean allClear = true;
+		//Check if there are obsticles in our sensing range
+		while(rc.getLocation().distanceSquaredTo(check) < rc.getType().sensorRadiusSquared){
+			if(rc.senseTerrainTile(check) != TerrainTile.NORMAL || rc.senseRobotAtLocation(check) != null){
+				allClear = false;
+				break;
+			}
+			check = check.add(dir);
+		}
+		if(allClear){
+			//If there are no obsticles, move in the direction if possible
+			if(rc.canMove(dir) && rc.isCoreReady()){
+				rc.move(dir);
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			//If there is an obsticle, find the leftmost and rightmost points of it
+			//Note that we want to find the ones closest to us
+			Direction[] toCheckLeft = {dir.opposite(),
+					dir.rotateLeft().rotateLeft().rotateLeft(),
+					dir.rotateLeft().rotateLeft(),
+					dir.rotateLeft()};
+			Direction[] toCheckRight = {dir.opposite(),
+					dir.rotateRight().rotateRight().rotateRight(),
+					dir.rotateRight().rotateRight(),
+					dir.rotateRight()};
+			MapLocation leftMost = check;
+			MapLocation rightMost = check;
+			
+			//While we can sense the squares, try and find a blocked tile that is more to the left
+			outer: while(rc.canSenseLocation(leftMost)){
+				MapLocation old = leftMost;
+				for(Direction toCheck: toCheckLeft){
+					MapLocation locToCheck = leftMost.add(toCheck);
+					if(rc.canSenseLocation(locToCheck)){
+						if(rc.senseTerrainTile(locToCheck) != TerrainTile.NORMAL){// || rc.senseRobotAtLocation(locToCheck)!= null){
+							leftMost = locToCheck;
+							if(rc.getID() == 7727){
+								System.out.println(locToCheck + ", " + rc.senseTerrainTile(locToCheck));
+							}
+							break;
+						}
+					}else{
+						break outer;
+					}
+				}
+				if(old.equals(leftMost)){
+					break;
+				}
+			}
+			
+			//While we can sense the squares, try and find a blocked tile that is more to the right
+			outer: while(rc.canSenseLocation(rightMost)){
+				MapLocation old = rightMost;
+				for(Direction toCheck: toCheckRight){
+					MapLocation locToCheck = rightMost.add(toCheck);
+					if(rc.canSenseLocation(locToCheck)){
+						if(rc.senseTerrainTile(locToCheck) != TerrainTile.NORMAL){// || rc.senseRobotAtLocation(locToCheck)!= null){
+							rightMost = locToCheck;
+							break;
+						}
+					}else{
+						break outer;
+					}
+				}
+				if(old.equals(rightMost)){
+					break;
+				}
+			}
+			rc.setIndicatorString(0, leftMost.toString());
+			rc.setIndicatorString(1, rightMost.toString());
+			rc.setIndicatorString(2, check.toString());
+			//if(rc.getID()== 206) printPathingVis(leftMost, rightMost);
+			//If our qstart loc isnt defined, define dat shit
+			if(bugPathing.from ==null) bugPathing.from = rc.senseHQLocation();
+
+			//If the heurestric for left better then the right then it win else right win
+			int leftHurestic = bugPathing.from.distanceSquaredTo(leftMost)+toPathTo.distanceSquaredTo(leftMost);
+			int rightHurestic = bugPathing.from.distanceSquaredTo(rightMost)+toPathTo.distanceSquaredTo(rightMost);
+			if(leftHurestic < rightHurestic){
+				//If there are no obsticles, move in the direction if possible
+				dir = rc.getLocation().directionTo(leftMost);
+				return moveAsCloseToDirection(dir);
+			}else if(rightHurestic < leftHurestic){
+				//If there are no obsticles, move in the direction if possible
+				dir = rc.getLocation().directionTo(rightMost);
+				return moveAsCloseToDirection(dir);
+			}else{
+				if(rand.nextDouble() <0.5){
+					//If there are no obsticles, move in the direction if possible
+					dir = rc.getLocation().directionTo(leftMost);
+					return moveAsCloseToDirection(dir);
+				}else{
+					//If there are no obsticles, move in the direction if possible
+					dir = rc.getLocation().directionTo(rightMost);
+					return moveAsCloseToDirection(dir);
+				}
+			}
+		}
+	}
+	
 	public boolean clearPath(MapLocation A, MapLocation B) throws GameActionException{
 		MapLocation toTest = A.add(A.directionTo(B));
 		while(!toTest.equals(B)){
@@ -342,5 +465,44 @@ public abstract class BaseRobot {
 				ComSystem.logOffMap(square);
 			}
 		}
+	}
+	public void printPathingVis(MapLocation leftMost, MapLocation rightMost) throws GameActionException{
+		MapLocation[] vis = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), rc.getType().sensorRadiusSquared);
+		for(int j = rc.getLocation().y-15; j< rc.getLocation().y+15; j++){
+			for(int i = rc.getLocation().x-15; i< rc.getLocation().x+15; i++){
+				MapLocation place = new MapLocation(i,j);
+				if(rc.getLocation().distanceSquaredTo(place) < rc.getType().sensorRadiusSquared){
+					if(place.equals(leftMost)||place.equals(rightMost)){
+						System.out.print("Y");
+						continue;
+					}
+					if(place.equals(rc.getLocation())){
+						System.out.print("R");
+						continue;
+					}
+					if(rc.senseRobotAtLocation(place)!=null){
+						System.out.print("X");
+					}
+					switch(rc.senseTerrainTile(place)){
+					case VOID:
+						System.out.print("X");
+						break;
+					case OFF_MAP:
+						System.out.print("X");
+						break;
+					case NORMAL:
+						System.out.print(" ");
+						break;
+					case UNKNOWN:
+						System.out.print("U");
+						break;					
+					}
+				}else{
+					System.out.print(" ");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println("---------------------------------------------------");
 	}
 }
