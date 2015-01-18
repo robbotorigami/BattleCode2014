@@ -12,6 +12,7 @@ public class HQ extends BaseRobot {
 	public final int SWARMCHANNEL = 199;
 	public final int SWARMDISTANCE = 10;
 	public final int SWARMAMOUNT = 10;
+	public final int SWARMOVERLOAD = 20;
 
 	public HQ(RobotController rcin){
 		super(rcin);
@@ -51,7 +52,7 @@ public class HQ extends BaseRobot {
 	public void handleSwarm() throws GameActionException{
 		if(Clock.getRoundNum() > 800){
 			if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam())>SWARMAMOUNT){
-				if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
+				if((robotsAtWaypoint()|| robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > SWARMOVERLOAD || Clock.getRoundNum()>1200)  && currentWaypoint < waypoints.length-1 ){
 					currentWaypoint++;
 				}
 			}

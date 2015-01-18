@@ -10,6 +10,7 @@ public class Launcher extends BaseRobot {
 	public Launcher(RobotController rcin){
 		super(rcin);
 		rc = rcin;
+		initBetterPathing(ourHQ);
 		//int myID = robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam());
 	}
 	
@@ -18,8 +19,9 @@ public class Launcher extends BaseRobot {
 		//ComSystem.sendLocation(myID+200,rc.getLocation(), true);
 		launchAtWeakest();
 		supplyChain();
+		rc.setIndicatorString(0, shouldWeMove() + "");
 		if(shouldWeMove())
-			basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
+			betterPathing(ComSystem.getLocation(199));
 		rc.yield();
 	}
 	
