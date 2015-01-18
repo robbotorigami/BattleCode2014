@@ -59,9 +59,9 @@ public class Drone extends BaseRobot {
 			harass();
 			break;
 		}
-		}
+	}
 
-		
+
 		/*if(Clock.getRoundNum() > 800){
 			if(!areWeAnnoying){
 				shootWeakest();
@@ -130,30 +130,29 @@ public class Drone extends BaseRobot {
 
 	private void supplyTheLaunchers() throws GameActionException {
 		RobotInfo[] launchers = robotsOnTeam(RobotType.LAUNCHER, rc.getTeam());
-		for(RobotInfo ri: launchers){
-			int toSupply = 0;
-			toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
-			if(rc.senseRobotAtLocation(ri.location) != null){
-				if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-					
-					if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
+		if(rc.getSupplyLevel() > 250){
+			for(RobotInfo ri: launchers){
+				int toSupply = 0;
+				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+				if(rc.senseRobotAtLocation(ri.location) != null){
+					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+
+						if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
 							rc.transferSupplies(toSupply, ri.location);
 							break;
-					}
-					
-				}
+						}
 
-			}
-			if(rc.getSupplyLevel() > 250){
-				if(ri.supplyLevel < 50){
+					}
+
+				}
+				if(ri.supplyLevel < 1000){
 					basicPathing(rc.getLocation().directionTo(ri.location));
 					break;
 				}
-			}else{
-				basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
-			}	
-
-		}
+			}
+		}else{
+			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
+		}	
 		rc.yield();
 
 	}
