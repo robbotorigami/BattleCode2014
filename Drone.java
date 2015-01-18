@@ -19,8 +19,7 @@ public class Drone extends BaseRobot {
 	public ID myID;
 	public Drone(RobotController rcin){
 		super(rcin);
-		rc = rcin;
-		supplyingLaunchers = false; 
+		rc = rcin; 
 		myID = ID.SCOUTING;
 		try {
 			rc.broadcast(2099, rc.readBroadcast(2099)+1);
@@ -171,7 +170,7 @@ public class Drone extends BaseRobot {
 		{
 			myID = ID.FIND_WAYPOINT;
 		}
-		myID = ID.SUPPLY_LAUNCHERS;
+		myID = ID.SUPPLY_MINERS;
 
 
 	}
