@@ -20,6 +20,7 @@ public class Miner extends BaseRobot {
 	public void run() throws GameActionException {
 		shootWeakest();
 		mineAndMove();
+		supplyChain();
 		ComSystem.logMiningIfBetter(getOreNear(), rc.getLocation());
 		//updateMiningInfo();
 		rc.yield();
@@ -80,6 +81,22 @@ public class Miner extends BaseRobot {
 					ComSystem.logMined(rc.getLocation().add(selected));
 				}
 				lastMove = selected;
+			}
+			
+		}
+	}
+	private void supplyChain() throws GameActionException{
+		RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
+		for(RobotInfo ri: Robots){
+			if(ri.supplyLevel<rc.getSupplyLevel()*0.75){
+				int toSupply = 0;				
+				if(ri.type == RobotType.MINER){
+					toSupply = (int) ((rc.getSupplyLevel()-ri.supplyLevel)/2);
+				}
+				if(rc.senseRobotAtLocation(ri.location) != null && toSupply !=0){
+					rc.transferSupplies(toSupply, ri.location);
+					break;
+				}
 			}
 			
 		}
