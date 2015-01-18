@@ -50,6 +50,7 @@ public class HQ extends BaseRobot {
 	}
 	
 	public void handleSwarm() throws GameActionException{
+		ComSystem.clearSync(57575);
 		if(Clock.getRoundNum() > 800){
 			if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam())>SWARMAMOUNT){
 				if((robotsAtWaypoint()|| robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > SWARMOVERLOAD || Clock.getRoundNum()>1200)  && currentWaypoint < waypoints.length-1 ){

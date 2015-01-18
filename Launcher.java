@@ -17,11 +17,15 @@ public class Launcher extends BaseRobot {
 	@Override
 	public void run() throws GameActionException {
 		//ComSystem.sendLocation(myID+200,rc.getLocation(), true);
+		if(rc.isWeaponReady() && rc.getMissileCount() >=1){
+			ComSystem.incSync(57575);
+		}
 		launchAtWeakest();
+		dartAway();
 		supplyChain();
 		rc.setIndicatorString(0, shouldWeMove() + "");
 		if(shouldWeMove())
-			betterPathing(ComSystem.getLocation(199));
+			basicPathing(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 		rc.yield();
 	}
 	
@@ -45,6 +49,7 @@ public class Launcher extends BaseRobot {
 		}
 	}
 	public void launchAtWeakest() throws GameActionException{
+		//if(ComSystem.readSync(57575) < 10) return;
 		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(36, rc.getTeam().opponent());
 		double LowestHealth = 10000;
 		RobotInfo weakestLink = null;
@@ -90,6 +95,16 @@ public class Launcher extends BaseRobot {
 		}else{
 			return false;
 		}
+	}
+	
+	private void dartAway() throws GameActionException {
+		RobotInfo[] Robots = rc.senseNearbyRobots(30, rc.getTeam().opponent());
+		for(RobotInfo ri: Robots){
+			if(rc.getLocation().distanceSquaredTo(ri.location) <= ri.type.attackRadiusSquared){
+				moveAsCloseToDirection(ri.location.directionTo(rc.getLocation()));
+			}
+		}
+		
 	}
 	
 

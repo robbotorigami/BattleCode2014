@@ -43,7 +43,7 @@ public class Miner extends BaseRobot {
 				roundLastSkipped = Clock.getRoundNum();
 			}
 		}
-		if(rc.senseOre(rc.getLocation()) >0.2 && !skipSquare){
+		if(rc.senseOre(rc.getLocation()) > 1 && !minerBehind()){
 			if(rc.isCoreReady()&&rc.canMine())
 				rc.mine();
 		}else{
@@ -69,9 +69,9 @@ public class Miner extends BaseRobot {
 					//selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ),20));
 				}else{
 					if(rc.getID()%2 == 0)
-						selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ).rotateLeft().rotateLeft(),20));
+						selected = ourHQ.directionTo(theirHQ).rotateLeft().rotateLeft();//rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ).rotateLeft().rotateLeft(),20));
 					else
-						selected = rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ).rotateRight().rotateRight(),20));
+						selected = ourHQ.directionTo(theirHQ).rotateRight().rotateRight();//rc.getLocation().directionTo(ourHQ.add(ourHQ.directionTo(theirHQ).rotateRight().rotateRight(),20));
 				}
 			}
 			
@@ -100,6 +100,18 @@ public class Miner extends BaseRobot {
 			}
 			
 		}
+	}
+	
+	private boolean minerBehind() throws GameActionException{
+		RobotInfo[] miners = robotsOnTeam(RobotType.MINER, rc.getTeam());
+		for(RobotInfo miner:miners){
+			if(miner.location.isAdjacentTo(rc.getLocation())){
+				if(rc.senseOre(miner.location) < 1){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

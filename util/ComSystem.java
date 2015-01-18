@@ -133,7 +133,7 @@ public class ComSystem {
 	
 	//------------------Sync Methods------------------------------
 	//read a message from the proper channel if synced
-	private static int readSync(int channel) throws GameActionException{
+	public static int readSync(int channel) throws GameActionException{
 		//If match num is even, use the alt channel
 		if(Clock.getRoundNum()%2 == 0){
 			return rc.readBroadcast(channel+1);
@@ -162,12 +162,12 @@ public class ComSystem {
 	}
 	
 	//Increment the specified synced channel
-	private static void incSync(int channel) throws GameActionException{
+	public static void incSync(int channel) throws GameActionException{
 		writeSync(channel, readSyncInverted(channel)+1);
 	}
 	
 	//Set the specified channel to zero
-	private static void clearSync(int channel) throws GameActionException{
+	public static void clearSync(int channel) throws GameActionException{
 		writeSync(channel, 0);
 	}
 	
