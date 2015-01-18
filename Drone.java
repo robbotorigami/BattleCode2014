@@ -69,8 +69,10 @@ public class Drone extends BaseRobot {
 	}
 
 	private void supplyTheLaunchers() throws GameActionException {
+		
+	
 		RobotInfo[] launchers = robotsOnTeam(RobotType.LAUNCHER, rc.getTeam());
-		if(rc.getSupplyLevel() > 1000){
+		if(supplying){
 			for(RobotInfo ri: launchers){
 				int toSupply = 0;
 				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
@@ -90,9 +92,16 @@ public class Drone extends BaseRobot {
 					break;
 				}
 			}
+			if(rc.getSupplyLevel() < 1000){
+				supplying = false;
+			}
 		}else{
 			basicPathingSafe(rc.getLocation().directionTo(rc.senseHQLocation()));
+			if(rc.getSupplyLevel() > 10000){
+				supplying = true;
+			}
 		}	
+		//if(rc.getSupplyLevel() < -)
 		rc.yield();
 
 	}
@@ -104,18 +113,19 @@ public class Drone extends BaseRobot {
 	}
 
 	@SuppressWarnings("unused")
-	private void scoutMap() {
+	private void scoutMap() throws GameActionException {
 		if(false) //if(ComSytem.pathingDone() && numOfDronesOfType(ID.FIND_WAYPOINT) < 1)
 		{
 			myID = ID.FIND_WAYPOINT;
 		}
-		myID = ID.SUPPLY_MINERS;
-
+		if(ComSystem.numOfDronesOfType(ID.SCOUTING) >2){
+				myID = ID.SUPPLY_MINERS;
+		}
 
 	}
 	private void supplyMiners() throws GameActionException {
 		RobotInfo[] miners = robotsOnTeam(RobotType.MINER, rc.getTeam());
-		if(rc.getSupplyLevel() > 1000){
+		if(supplying){
 			for(RobotInfo ri: miners){
 				int toSupply = 0;
 				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
@@ -138,13 +148,19 @@ public class Drone extends BaseRobot {
 
 
 			}
+			if(rc.getSupplyLevel() < 1000){
+				supplying = false;
+			}
 		}else{
 			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
+			if(rc.getSupplyLevel() > 10000){
+				supplying = true;
+			}
 		}
 		rc.yield();
 		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >4 && ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS) <5){
 			myID = ID.SUPPLY_LAUNCHERS;
-			
+
 		}
 
 	}
