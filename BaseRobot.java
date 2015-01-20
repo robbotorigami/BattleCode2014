@@ -29,21 +29,19 @@ public abstract class BaseRobot {
 	
 	public BaseRobot(RobotController rcin){
 		rc = rcin;
-		if(rc.getType() != RobotType.MISSILE){
-			rand = new Random(rc.getID());
-			ComSystem.init(rc);
-			ourHQ = rc.senseHQLocation();
-			theirHQ = rc.senseEnemyHQLocation();
-			BetterMapLocation.init(rc);
+		rand = new Random(rc.getID());
+		ourHQ = rc.senseHQLocation();
+		theirHQ = rc.senseEnemyHQLocation();
+		ComSystem.init(rc);
+		BetterMapLocation.init(rc);
 
-			oldLocs = new ArrayList();
-			for(int i =0; i<NUMOLDLOCS; i++){
-				oldLocs.add(new MapLocation(0,0));
-			}
-			lastDir = Direction.NORTH;
-			useBug = false;
-			bugPathing = new BugInfo();
+		oldLocs = new ArrayList();
+		for(int i =0; i<NUMOLDLOCS; i++){
+			oldLocs.add(new MapLocation(0,0));
 		}
+		lastDir = Direction.NORTH;
+		useBug = false;
+		bugPathing = new BugInfo();
 	}
 
 	//Abstract method for major functionality
@@ -207,6 +205,24 @@ public abstract class BaseRobot {
 		return fixyfix;
 	}
 	
+	public RobotInfo[] robotsOnTeam(RobotType type, int distance, Team team){
+		RobotInfo[] Robots = rc.senseNearbyRobots(distance, team);
+		RobotInfo[] ofType = new RobotInfo[1000];
+		int index = 0;
+		for(RobotInfo ri:Robots){
+			if(ri.type == type){
+				ofType[index] = ri;
+				index++;
+			}
+		}
+		RobotInfo[] fixyfix = new RobotInfo[index];
+		for(int i = 0; i<index; i++){
+			fixyfix[i] = ofType[i];
+		}
+		
+		return fixyfix;
+	}
+	
 	public boolean basicPathing(Direction toMove) throws GameActionException{
 		if(rc.isCoreReady()){
 			/*if(useBug){
@@ -224,6 +240,44 @@ public abstract class BaseRobot {
 			for(Direction dir:toTry){
 				boolean badLoc = false;
 				if(oldLocs.contains(rc.getLocation().add(dir))){
+					badLoc = true;
+				}
+				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
+					if(dir != toMove){
+						useBug = true;
+					}
+					oldLocs.add(rc.getLocation().add(dir));
+					oldLocs.remove(0);
+					lastDir = dir;
+					lastTried = toMove;
+					rc.move(dir);
+					return true;
+				}
+			}
+		}	
+		return false;
+	}
+	
+	public boolean basicPathingDiag(Direction toMove) throws GameActionException{
+		if(rc.isCoreReady()){
+			/*if(useBug){
+				return bugPath(toMove);
+			}*/
+			Direction[] toTry = {toMove,
+					toMove.rotateLeft(),
+					toMove.rotateRight(),
+					toMove.rotateLeft().rotateLeft(),
+					toMove.rotateRight().rotateRight(),
+					toMove.rotateLeft().rotateLeft().rotateLeft(),
+					toMove.rotateRight().rotateRight().rotateRight(),
+					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
+			};
+			for(Direction dir:toTry){
+				boolean badLoc = false;
+				if(oldLocs.contains(rc.getLocation().add(dir))){
+					badLoc = true;
+				}
+				if(rc.getLocation().add(dir).x%2 == rc.getLocation().add(dir).y%2){
 					badLoc = true;
 				}
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){

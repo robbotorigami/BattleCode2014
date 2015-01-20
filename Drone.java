@@ -43,6 +43,8 @@ public class Drone extends BaseRobot {
 
 	@Override
 	public void run() throws GameActionException {
+		rc.setIndicatorString(0, ""+ myID);
+		ComSystem.handleDroneID(myID);
 		switch(myID){
 		case SCOUTING:
 			scoutMap();
@@ -87,7 +89,7 @@ public class Drone extends BaseRobot {
 					}
 
 				}
-				if(ri.supplyLevel < 1000){
+				if(ri.supplyLevel < 3000){
 					basicPathingSafe(rc.getLocation().directionTo(ri.location));
 					break;
 				}
@@ -97,7 +99,7 @@ public class Drone extends BaseRobot {
 			}
 		}else{
 			basicPathingSafe(rc.getLocation().directionTo(rc.senseHQLocation()));
-			if(rc.getSupplyLevel() > 10000){
+			if(rc.getSupplyLevel() > 5000){
 				supplying = true;
 			}
 		}	
@@ -118,7 +120,7 @@ public class Drone extends BaseRobot {
 		{
 			myID = ID.FIND_WAYPOINT;
 		}
-		if(ComSystem.numOfDronesOfType(ID.SCOUTING) >2){
+		if(ComSystem.numOfDronesOfType(ID.SCOUTING) >-1000){
 				myID = ID.SUPPLY_MINERS;
 		}
 
@@ -128,7 +130,7 @@ public class Drone extends BaseRobot {
 		if(supplying){
 			for(RobotInfo ri: miners){
 				int toSupply = 0;
-				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0)/20;
 				if(rc.senseRobotAtLocation(ri.location) != null){
 					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
 
@@ -148,19 +150,20 @@ public class Drone extends BaseRobot {
 
 
 			}
-			if(rc.getSupplyLevel() < 1000){
+			if(rc.getSupplyLevel() < 250){
 				supplying = false;
 			}
 		}else{
 			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
-			if(rc.getSupplyLevel() > 10000){
+			if(rc.getSupplyLevel() > 1000){
 				supplying = true;
 			}
 		}
 		rc.yield();
-		if(robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >4 && ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS) <5){
+		if( ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS) <4 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >8){
 			myID = ID.SUPPLY_LAUNCHERS;
-
+			ComSystem.handleDroneID(myID);
+			System.out.println(ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS));
 		}
 
 	}

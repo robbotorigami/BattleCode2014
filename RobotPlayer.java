@@ -68,8 +68,14 @@ public class RobotPlayer {
 			myself = new Tower(rc);
 			break;
 		case MISSILE:
-			myself = new Missile(rc);
-			break;
+			Missile.missileInit(rc);
+			while(true){
+				try {
+					Missile.runs();
+				} catch (GameActionException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		//While true, run the run method in myself
 		while(true){

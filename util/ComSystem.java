@@ -47,7 +47,7 @@ public class ComSystem {
 	}
 
 	public static MapLocation getLocation(int channel) throws GameActionException{
-		int message = rc.readBroadcast(channel);
+		int message = rc.readBroadcast(channel)%100000000;
 		//Decode in the format fsyyysxxx
 		int x;
 		int y;
@@ -63,6 +63,14 @@ public class ComSystem {
 			y = message%1000;
 		}
 		return new BetterMapLocation(x,y).toMapLoc();
+	}
+	
+	public static boolean getFlag(int channel) throws GameActionException{
+		if(rc.readBroadcast(channel)/100000000 == 0){
+			return false;
+		}else{
+			return true;
+		}
 	}
 	
 	// Syncronized versions

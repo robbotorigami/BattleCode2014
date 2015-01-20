@@ -12,7 +12,11 @@ public class Beaver extends BaseRobot {
 		super(rcin);
 		rc = rcin;
 		turnsMoved = 0;
-		dir = getRandomDirection();
+		Direction[] possible = {ourHQ.directionTo(theirHQ),
+				ourHQ.directionTo(theirHQ).rotateLeft(),
+				ourHQ.directionTo(theirHQ).rotateRight()
+		};
+		dir = possible[rand.nextInt(3)];
 	}
 	
 	
@@ -20,14 +24,16 @@ public class Beaver extends BaseRobot {
 	public void run() throws GameActionException {
 		supplyChain();
 
-		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 2*2){
+		if(rand.nextDouble() <0.05){
+			basicPathing(dir);
+		}else if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 2*2){
 			buildUnit(RobotType.MINERFACTORY);
 		} 
-		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
-			buildUnit(RobotType.HELIPAD);
-		}
 		else if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
 			buildUnit(RobotType.MINERFACTORY);
+		}
+		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 3*3){
+			buildUnit(RobotType.HELIPAD);
 		}
 		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 4 && rc.getLocation().distanceSquaredTo(ourHQ) >= 5*5){
 			buildUnit(RobotType.SUPPLYDEPOT);
@@ -35,18 +41,18 @@ public class Beaver extends BaseRobot {
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.BARRACKS);
 		}*/
-		else if(robotsOfTypeOnTeam(RobotType.AEROSPACELAB,rc.getTeam()) < 4 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
+		else if(robotsOfTypeOnTeam(RobotType.AEROSPACELAB,rc.getTeam()) < 6 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.AEROSPACELAB);
-		} 
+		} /*
 		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.HELIPAD);
-		}
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 10 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 6){
+		}*/
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 10 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 2* robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam())){
 			buildUnit(RobotType.SUPPLYDEPOT);
-		}
+		}/*
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 6){
 			buildUnit(RobotType.BARRACKS);
-		}
+		}*/
 		else if(rc.isCoreReady()){
 			basicPathing(dir);
 			turnsMoved++;
