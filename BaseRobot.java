@@ -330,9 +330,6 @@ public abstract class BaseRobot {
 				}
 				
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
-					if(dir != toMove){
-						useBug = true;
-					}
 					oldLocs.add(rc.getLocation().add(dir));
 					oldLocs.remove(0);
 					lastDir = dir;

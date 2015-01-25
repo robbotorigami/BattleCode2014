@@ -12,8 +12,8 @@ public class TankFactory extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		// TODO Auto-generated method stub
-
+		spawnUnit(RobotType.TANK);
+		rc.yield();
 	}
 
 }

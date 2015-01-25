@@ -26,8 +26,13 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		int Profiler = Clock.getBytecodesLeft();
 		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
+		System.out.print((Clock.getBytecodesLeft() - Profiler) + ", ");
+		Profiler = Clock.getBytecodesLeft();
+		robotsAtWaypoint();
+		System.out.println(Clock.getBytecodesLeft() - Profiler);
 		handleSwarm();
 		supplyChain();
 		shootWeakest();
@@ -42,6 +47,7 @@ public class HQ extends BaseRobot {
 		if(rc.getHealth() < 50){
 			rc.setTeamMemory(0, 1);
 		}
+		
 	}
 	
 	public void initSwarm() throws GameActionException{
@@ -76,14 +82,14 @@ public class HQ extends BaseRobot {
 	public void handleSwarm() throws GameActionException{
 		ComSystem.clearSync(57575);
 
-		int numLaunchers = robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam());
+		int numTanks = robotsOfTypeOnTeam(RobotType.TANK, rc.getTeam());
 		
-		if(numLaunchers>SWARMAMOUNT){
+		if(numTanks>SWARMAMOUNT){
 			if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
 				currentWaypoint++;
 			}
 		}
-		if((numLaunchers> SWARMOVERLOAD || Clock.getRoundNum()>1200) && currentWaypoint <1){
+		if((numTanks> SWARMOVERLOAD || Clock.getRoundNum()>1200) && currentWaypoint <1){
 			currentWaypoint = 1;
 		}
 		if(Clock.getRoundNum() > rc.getRoundLimit() - 400){
@@ -103,7 +109,7 @@ public class HQ extends BaseRobot {
 		int sumLocx = 0;
 		int sumLocy = 0;
 		int total = 0;
-		for(RobotInfo ri: robotsOnTeam(RobotType.LAUNCHER, rc.getTeam())){
+		for(RobotInfo ri: robotsOnTeam(RobotType.TANK, rc.getTeam())){
 			if(ri == null) break;
 			sumLocx+=ri.location.x;
 			sumLocy+=ri.location.y;
