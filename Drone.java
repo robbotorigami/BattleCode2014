@@ -87,7 +87,7 @@ public class Drone extends BaseRobot {
 				}
 			}
 			if(closestToWaypoint != null){
-				basicPathing(rc.getLocation().directionTo(closestToWaypoint.location));
+				basicPathingSafe(rc.getLocation().directionTo(closestToWaypoint.location));
 				return;
 			}
 			for(RobotInfo ri: tanks){
@@ -156,7 +156,7 @@ public class Drone extends BaseRobot {
 				}
 
 				if(ri.supplyLevel < 50){
-					basicPathing(rc.getLocation().directionTo(ri.location));
+					basicPathingSafe(rc.getLocation().directionTo(ri.location));
 					break;
 				}
 
@@ -166,7 +166,7 @@ public class Drone extends BaseRobot {
 				supplying = false;
 			}
 		}else{
-			basicPathing(rc.getLocation().directionTo(rc.senseHQLocation()));
+			basicPathingSafe(rc.getLocation().directionTo(rc.senseHQLocation()));
 			if(rc.getSupplyLevel() > 1000){
 				supplying = true;
 			}
