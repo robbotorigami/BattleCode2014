@@ -62,6 +62,8 @@ public class Drone extends BaseRobot {
 			harass();
 			break;
 		}
+
+		rc.yield();
 	}
 	
 
@@ -84,7 +86,10 @@ public class Drone extends BaseRobot {
 					break;
 				}
 			}
-			if(closestToWaypoint != null) basicPathing(rc.getLocation().directionTo(closestToWaypoint.location));
+			if(closestToWaypoint != null){
+				basicPathing(rc.getLocation().directionTo(closestToWaypoint.location));
+				return;
+			}
 			for(RobotInfo ri: tanks){
 				int toSupply = 0;
 				if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 50)
@@ -112,7 +117,6 @@ public class Drone extends BaseRobot {
 			}
 		}	
 		//if(rc.getSupplyLevel() < -)
-		rc.yield();
 
 	}
 
@@ -172,7 +176,6 @@ public class Drone extends BaseRobot {
 			ComSystem.handleDroneID(myID);
 			System.out.println(ComSystem.numOfDronesOfType(ID.SUPPLY_TANKS));
 		}
-		rc.yield();
 		
 
 	}

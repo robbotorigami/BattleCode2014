@@ -13,6 +13,7 @@ public class HQ extends BaseRobot {
 	public final int SWARMDISTANCE = 10;
 	public int SWARMAMOUNT = 10;
 	public final int SWARMOVERLOAD = 20;
+	int Profiler;
 
 	public HQ(RobotController rcin){
 		super(rcin);
@@ -26,13 +27,10 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		int Profiler = Clock.getBytecodesLeft();
+		Profiler = Clock.getBytecodesLeft();
 		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
 		System.out.print((Clock.getBytecodesLeft() - Profiler) + ", ");
-		Profiler = Clock.getBytecodesLeft();
-		robotsAtWaypoint();
-		System.out.println(Clock.getBytecodesLeft() - Profiler);
 		handleSwarm();
 		supplyChain();
 		shootWeakest();
@@ -109,7 +107,10 @@ public class HQ extends BaseRobot {
 		int sumLocx = 0;
 		int sumLocy = 0;
 		int total = 0;
-		for(RobotInfo ri: robotsOnTeam(RobotType.TANK, rc.getTeam())){
+		Profiler = Clock.getBytecodesLeft();
+		RobotInfo[] robots = robotsOnTeam(RobotType.TANK, rc.getTeam()); 
+		System.out.println(Clock.getBytecodesLeft() - Profiler);
+		for(RobotInfo ri: robots){
 			if(ri == null) break;
 			sumLocx+=ri.location.x;
 			sumLocy+=ri.location.y;
