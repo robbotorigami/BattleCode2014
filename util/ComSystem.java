@@ -12,7 +12,7 @@ public class ComSystem {
 	public static final int COUNTERDRONESCOUTING = 5000;
 	public static final int COUNTERDRONEFIND_WAYPOINT = 5002;
 	public static final int COUNTERDRONESUPPLYMINER = 5004;
-	public static final int COUNTERDRONESUPPLYLAUNCHER = 5006;
+	public static final int COUNTERDRONESUPPLYTANKS = 5006;
 	public static final int COUNTERDRONEHARASS = 5008;
 	private static MapLocation miningLocation;
 	
@@ -244,8 +244,8 @@ public class ComSystem {
 		case SUPPLY_MINERS:
 			incSync(COUNTERDRONESUPPLYMINER);
 			break;
-		case SUPPLY_LAUNCHERS:
-			incSync(COUNTERDRONESUPPLYLAUNCHER);
+		case SUPPLY_TANKS:
+			incSync(COUNTERDRONESUPPLYTANKS);
 			break;
 		case HARASS:
 			incSync(COUNTERDRONEHARASS);
@@ -257,7 +257,7 @@ public class ComSystem {
 		clearSync(COUNTERDRONESCOUTING);
 		clearSync(COUNTERDRONEFIND_WAYPOINT);
 		clearSync(COUNTERDRONESUPPLYMINER);
-		clearSync(COUNTERDRONESUPPLYLAUNCHER);
+		clearSync(COUNTERDRONESUPPLYTANKS);
 		clearSync(COUNTERDRONEHARASS);
 	}
 	
@@ -269,8 +269,8 @@ public class ComSystem {
 			return readSync(COUNTERDRONEFIND_WAYPOINT);
 		case SUPPLY_MINERS:
 			return readSync(COUNTERDRONESUPPLYMINER);
-		case SUPPLY_LAUNCHERS:
-			return readSync(COUNTERDRONESUPPLYLAUNCHER);
+		case SUPPLY_TANKS:
+			return readSync(COUNTERDRONESUPPLYTANKS);
 		case HARASS:
 			return readSync(COUNTERDRONEHARASS);
 		}
