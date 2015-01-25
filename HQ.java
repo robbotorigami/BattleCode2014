@@ -37,7 +37,6 @@ public class HQ extends BaseRobot {
 		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10 && rc.getTeamOre() >600){
 			spawnUnit(RobotType.BEAVER);
 		}
-		System.out.println(Clock.getBytecodesLeft());
 		rc.yield();
 		
 		if(rc.getHealth() < 50){

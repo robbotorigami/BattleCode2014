@@ -100,9 +100,9 @@ public abstract class BaseRobot {
 	}
 	
 	//Builds a unit in a random direction
-	public void buildUnit(RobotType toBuild) throws GameActionException{
+	public boolean buildUnit(RobotType toBuild) throws GameActionException{
+		if(toBuild == null) return false;
 		if(rc.isCoreReady()){
-			boolean unitBuilt = false;
 			Direction dir = getRandomDirection();
 			Direction[] toTry = {dir,
 					dir.rotateLeft(),
@@ -118,11 +118,13 @@ public abstract class BaseRobot {
 				if(wouldBeBuilt.x%2 == wouldBeBuilt.y%2){
 					if(rc.isCoreReady()&&rc.canBuild(buildDir, toBuild)){	
 						rc.build(buildDir, toBuild);
-						break;
+						return true;
 					}
 				}
 			}
 		}
+		
+		return false;
 	}
 	
 	//Move as close as possible to the provided direction

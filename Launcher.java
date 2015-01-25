@@ -74,7 +74,7 @@ public class Launcher extends BaseRobot {
 	}
 	public void launchAtWeakest() throws GameActionException{
 		//if(ComSystem.readSync(57575) < 10) return;
-		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(36, rc.getTeam().opponent());
+		RobotInfo[] enemiesInRange = rc.senseNearbyRobots(25, rc.getTeam().opponent());
 		double LowestHealth = 10000;
 		RobotInfo weakestLink = null;
 		for(RobotInfo ri:enemiesInRange){
@@ -144,9 +144,6 @@ public class Launcher extends BaseRobot {
 	public boolean shouldWeMove(MapLocation target) throws GameActionException{
 		MapLocation[] towers = rc.senseEnemyTowerLocations();
 		MapLocation wouldMoveTo = rc.getLocation().add(rc.getLocation().directionTo(target));
-		if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 4){
-			return false;
-		}
 		for(MapLocation loc: towers){
 			if(wouldMoveTo.distanceSquaredTo(loc) <= 20){//RobotType.TOWER.attackRadiusSquared){
 				return false;
@@ -174,7 +171,7 @@ public class Launcher extends BaseRobot {
 	}
 	
 	public boolean swarmMoving() throws GameActionException{
-		
+		/*
 		RobotInfo[] swarmMates = robotsOnTeam(RobotType.LAUNCHER, 40, rc.getTeam());
 		int sumLocx = 0;
 		int sumLocy = 0;
@@ -198,13 +195,21 @@ public class Launcher extends BaseRobot {
 			target = center.add(center.directionTo(currentWaypoint),4);
 		}else{
 			target = center.add(center.directionTo(currentWaypoint).opposite(), 4);
+		}*/
+		MapLocation target;
+		if(rc.getMissileCount() >2){
+			target = currentWaypoint;
+		}else{
+			target = currentWaypoint.add(currentWaypoint.directionTo(lastWaypoint), 4);
 		}
 		
+		/*
 		if(target.distanceSquaredTo(rc.getLocation()) > currentWaypoint.distanceSquaredTo(rc.getLocation())){
 			target = currentWaypoint;
 		}
+		*/
 		
-		if(!shouldWeMove(target) ||rc.getMissileCount() >2 && Clock.getRoundNum()%2 == 0){
+		if(!shouldWeMove(target) || rc.getMissileCount() >2){
 			launchAtWeakest();
 			return false;
 		}else if(shouldWeMove(target)){
@@ -217,6 +222,10 @@ public class Launcher extends BaseRobot {
 	
 	public boolean basicPathingSwarm(Direction toMove) throws GameActionException{
 		if(rc.isCoreReady()){
+			oldLocs.remove(0);
+			while(oldLocs.size() < NUMOLDLOCS){
+				oldLocs.add(new MapLocation(0,0));
+			}
 			Direction[] toTry = {toMove,
 					toMove.rotateLeft(),
 					toMove.rotateRight(),
@@ -225,8 +234,7 @@ public class Launcher extends BaseRobot {
 					toMove.rotateLeft().rotateLeft().rotateLeft(),
 					toMove.rotateRight().rotateRight().rotateRight(),
 					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
-			};
-			
+			};		
 			
 			for(Direction dir:toTry){
 				boolean badLoc = false;
@@ -236,7 +244,7 @@ public class Launcher extends BaseRobot {
 				}
 				RobotInfo[] launches = robotsOnTeam(RobotType.LAUNCHER, 10, rc.getTeam());
 				for(RobotInfo launcher:launches){
-					if(rc.getLocation().add(dir).distanceSquaredTo(launcher.location) <2 && dangerWillRobinson == null){
+					if(rc.getLocation().add(dir).distanceSquaredTo(launcher.location) <2){
 						//badLoc = true;
 					}
 				}
@@ -249,10 +257,10 @@ public class Launcher extends BaseRobot {
 				if(wouldMoveTo.distanceSquaredTo(rc.senseEnemyHQLocation()) <= 20){//RobotType.HQ.attackRadiusSquared){
 					badLoc = true;
 				}
-				
+				rc.setIndicatorString(2, badLoc +"");
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
+					rc.setIndicatorString(1, dir.toString() + ", " + Clock.getRoundNum());
 					oldLocs.add(rc.getLocation().add(dir));
-					oldLocs.remove(0);
 					lastDir = dir;
 					lastTried = toMove;
 					rc.move(dir);
