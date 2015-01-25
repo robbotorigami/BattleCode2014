@@ -13,7 +13,7 @@ public class Drone extends BaseRobot {
 	public MapLocation center;
 	public enum ID{
 		SCOUTING,FIND_WAYPOINT,
-		SUPPLY_MINERS,SUPPLY_LAUNCHERS,
+		SUPPLY_MINERS,SUPPLY_TANKS,
 		HARASS
 	}
 	public ID myID;
@@ -55,8 +55,8 @@ public class Drone extends BaseRobot {
 		case SUPPLY_MINERS:
 			supplyMiners();
 			break;
-		case SUPPLY_LAUNCHERS:
-			supplyTheLaunchers();
+		case SUPPLY_TANKS:
+			supplyTheTanks();
 			break;
 		case HARASS:
 			harass();
@@ -70,14 +70,14 @@ public class Drone extends BaseRobot {
 
 	}
 
-	private void supplyTheLaunchers() throws GameActionException {
+	private void supplyTheTanks() throws GameActionException {
 		
 	
-		RobotInfo[] launchers = robotsOnTeam(RobotType.LAUNCHER, rc.getTeam());
+		RobotInfo[] tanks = robotsOnTeam(RobotType.TANK, rc.getTeam());
 		if(supplying){
 			RobotInfo closestToWaypoint = null;
 			int bestDisToWaypoint = 1000000;
-			for(RobotInfo ri: launchers){
+			for(RobotInfo ri: tanks){
 				if(ri.supplyLevel < 3000 && rc.getLocation().distanceSquaredTo(ri.location) < bestDisToWaypoint){
 					closestToWaypoint = ri;
 					bestDisToWaypoint =  rc.getLocation().distanceSquaredTo(ri.location);
@@ -85,7 +85,7 @@ public class Drone extends BaseRobot {
 				}
 			}
 			if(closestToWaypoint != null) basicPathing(rc.getLocation().directionTo(closestToWaypoint.location));
-			for(RobotInfo ri: launchers){
+			for(RobotInfo ri: tanks){
 				int toSupply = 0;
 				if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 50)
 					toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
@@ -167,12 +167,13 @@ public class Drone extends BaseRobot {
 				supplying = true;
 			}
 		}
-		rc.yield();
-		if( ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS) <4 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >8){
-			myID = ID.SUPPLY_LAUNCHERS;
+		if( ComSystem.numOfDronesOfType(ID.SUPPLY_TANKS) <4 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >8){
+			myID = ID.SUPPLY_TANKS;
 			ComSystem.handleDroneID(myID);
-			System.out.println(ComSystem.numOfDronesOfType(ID.SUPPLY_LAUNCHERS));
+			System.out.println(ComSystem.numOfDronesOfType(ID.SUPPLY_TANKS));
 		}
+		rc.yield();
+		
 
 	}
 
