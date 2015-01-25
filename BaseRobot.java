@@ -12,7 +12,7 @@ public abstract class BaseRobot {
 	public Random rand; //Random number generator
 	public MapLocation theirHQ; //location of their HQ
 	public MapLocation ourHQ; //location of our HQ
-	public ArrayList oldLocs;
+	public ArrayList<MapLocation> oldLocs;
 	public Direction lastDir;
 	public Direction lastTried;
 	public boolean useBug;
@@ -35,7 +35,7 @@ public abstract class BaseRobot {
 		ComSystem.init(rc);
 		BetterMapLocation.init(rc);
 
-		oldLocs = new ArrayList();
+		oldLocs = new ArrayList<MapLocation>();
 		for(int i =0; i<NUMOLDLOCS; i++){
 			oldLocs.add(new MapLocation(0,0));
 		}
