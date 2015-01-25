@@ -167,7 +167,7 @@ public class Drone extends BaseRobot {
 				supplying = true;
 			}
 		}
-		if( ComSystem.numOfDronesOfType(ID.SUPPLY_TANKS) <4 || robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) >8){
+		if( ComSystem.numOfDronesOfType(ID.SUPPLY_TANKS) <4 || robotsOfTypeOnTeam(RobotType.TANK, rc.getTeam()) >8){
 			myID = ID.SUPPLY_TANKS;
 			ComSystem.handleDroneID(myID);
 			System.out.println(ComSystem.numOfDronesOfType(ID.SUPPLY_TANKS));
