@@ -75,12 +75,24 @@ public class Drone extends BaseRobot {
 	
 		RobotInfo[] launchers = robotsOnTeam(RobotType.LAUNCHER, rc.getTeam());
 		if(supplying){
+			RobotInfo closestToWaypoint = null;
+			int bestDisToWaypoint = 1000000;
+			for(RobotInfo ri: launchers){
+				if(ri.supplyLevel < 3000 && rc.getLocation().distanceSquaredTo(ri.location) < bestDisToWaypoint){
+					closestToWaypoint = ri;
+					bestDisToWaypoint =  rc.getLocation().distanceSquaredTo(ri.location);
+					break;
+				}
+			}
+			if(closestToWaypoint != null) basicPathing(rc.getLocation().directionTo(closestToWaypoint.location));
 			for(RobotInfo ri: launchers){
 				int toSupply = 0;
-				toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+				if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 50)
+					toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+				else if(ri.supplyLevel < 2000)
+					toSupply = (int) Math.min(2000, rc.getSupplyLevel()/2);
 				if(rc.senseRobotAtLocation(ri.location) != null){
 					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-
 						if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
 							rc.transferSupplies(toSupply, ri.location);
 							break;
@@ -88,10 +100,6 @@ public class Drone extends BaseRobot {
 
 					}
 
-				}
-				if(ri.supplyLevel < 3000){
-					basicPathingSafe(rc.getLocation().directionTo(ri.location));
-					break;
 				}
 			}
 			if(rc.getSupplyLevel() < 1000){

@@ -87,7 +87,7 @@ public class HQ extends BaseRobot {
 		if((numLaunchers> SWARMOVERLOAD || Clock.getRoundNum()>1200) && currentWaypoint <1){
 			currentWaypoint = 1;
 		}
-		if(Clock.getRoundNum() > 1700){
+		if(Clock.getRoundNum() > rc.getRoundLimit() - 400){
 			currentWaypoint = waypoints.length-1;
 		}
 		if(currentWaypoint == 0){
@@ -186,9 +186,14 @@ public class HQ extends BaseRobot {
 	}
 	
 	public int calcDistanceFromCenterLine(MapLocation toCheck){
+		boolean vertical = false;
 		int dx = ourHQ.x - theirHQ.x;
 		int dy = ourHQ.y - theirHQ.y;
-		double slope = dy/dx;
+		double slope = 1;
+		if(dx != 0)
+			slope = dy/dx;
+		else
+			vertical = true;
 		double lineAngle = Math.toDegrees(Math.atan2(dy, dx));
 		if(lineAngle >180) lineAngle -=360;
 		dx = ourHQ.x - toCheck.x;
@@ -220,7 +225,7 @@ public class HQ extends BaseRobot {
 		
 		int distance = 0;
 		MapLocation orig = toCheck;
-		while(Math.abs((toCheck.x-ourHQ.x)*slope - (toCheck.y - ourHQ.y) )> 1){
+		while((Math.abs((toCheck.x-ourHQ.x)*slope - (toCheck.y - ourHQ.y)) > 1 && !vertical)|| toCheck.x - ourHQ.x == 0 && vertical){
 			distance++;
 			toCheck = toCheck.add(perpendicular);
 			//System.out.println(perpendicular + ", " + toCheck+ "," + orig);

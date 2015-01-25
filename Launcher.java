@@ -7,6 +7,7 @@ public class Launcher extends BaseRobot {
 	public RobotController rc;
 	public MapLocation lastWaypoint;
 	public MapLocation currentWaypoint;
+	public Direction dangerWillRobinson;
 	//public int myID;
 	
 	public Launcher(RobotController rcin){
@@ -20,9 +21,11 @@ public class Launcher extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		detectAvoidDanger();
+		rc.setIndicatorString(0,"Going to " +ComSystem.getLocation(199));
 		//ComSystem.sendLocation(myID+200,rc.getLocation(), true);
 		if(rc.isWeaponReady() && rc.getMissileCount() >=1){
-			ComSystem.incSync(57575);
+			//ComSystem.incSync(57575);
 		}
 		//launchAtWeakest();
 		//dartAway();
@@ -30,11 +33,18 @@ public class Launcher extends BaseRobot {
 		swarmMoving();
 		supplyChain();
 		
-		//if(shouldWeMove())
 			//basicPathingSwarm(rc.getLocation().directionTo(ComSystem.getLocation(199)));
 		rc.yield();
 	}
 	
+	private void detectAvoidDanger() throws GameActionException {
+		dangerWillRobinson = locateTheDanger(true);
+		if(dangerWillRobinson != null){
+			basicPathing(dangerWillRobinson);
+		}
+		
+	}
+
 	private void updateWaypoint() throws GameActionException {
 		if(!currentWaypoint.equals(ComSystem.getLocation(199))){
 			lastWaypoint = currentWaypoint;
@@ -207,9 +217,6 @@ public class Launcher extends BaseRobot {
 	
 	public boolean basicPathingSwarm(Direction toMove) throws GameActionException{
 		if(rc.isCoreReady()){
-			/*if(useBug){
-				return bugPath(toMove);
-			}*/
 			Direction[] toTry = {toMove,
 					toMove.rotateLeft(),
 					toMove.rotateRight(),
@@ -219,6 +226,8 @@ public class Launcher extends BaseRobot {
 					toMove.rotateRight().rotateRight().rotateRight(),
 					toMove.rotateLeft().rotateLeft().rotateLeft().rotateLeft()
 			};
+			
+			
 			for(Direction dir:toTry){
 				boolean badLoc = false;
 				MapLocation wouldMoveTo = rc.getLocation().add(dir);
@@ -227,7 +236,7 @@ public class Launcher extends BaseRobot {
 				}
 				RobotInfo[] launches = robotsOnTeam(RobotType.LAUNCHER, 10, rc.getTeam());
 				for(RobotInfo launcher:launches){
-					if(rc.getLocation().add(dir).distanceSquaredTo(launcher.location) <2 && rand.nextDouble() < 0.1){
+					if(rc.getLocation().add(dir).distanceSquaredTo(launcher.location) <2 && dangerWillRobinson == null){
 						//badLoc = true;
 					}
 				}
@@ -242,9 +251,6 @@ public class Launcher extends BaseRobot {
 				}
 				
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
-					if(dir != toMove){
-						useBug = true;
-					}
 					oldLocs.add(rc.getLocation().add(dir));
 					oldLocs.remove(0);
 					lastDir = dir;

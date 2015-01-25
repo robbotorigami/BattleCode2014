@@ -568,4 +568,50 @@ public abstract class BaseRobot {
 		}
 		System.out.println("---------------------------------------------------");
 	}
+	/**
+	    * if there is danger, tells us how we should move
+	    * @return null if no danger, or the direction away from the danger
+	    */
+	public Direction locateTheDanger(boolean toughGuy){
+		RobotInfo[] enemies = rc.senseNearbyRobots(24, rc.getTeam().opponent());
+		int sumX = 0;
+		int sumY = 0;
+		int total = 0;
+		for(RobotInfo enemy: enemies){
+			if(toughGuy && !doesHeEvenLift(enemy.type))
+				continue;
+			if(rc.getLocation().distanceSquaredTo(enemy.location) < enemy.type.attackRadiusSquared){
+				sumX +=enemy.location.x;
+				sumY += enemy.location.y;
+				total++;
+			}
+		}
+		if(total == 0){
+			return null;
+		}else{
+			MapLocation center = new MapLocation(sumX/total, sumY/total);
+			return center.directionTo(rc.getLocation());
+		}
+	}
+	
+	/**
+	 * runs though seeing if the passed robot type is even worth caring about
+	 * @param type the type of the robot to check
+	 * @return true if he lifts, false if he is puny and can be squashed like a bug
+	 */
+	public boolean doesHeEvenLift(RobotType type){
+		if(type == RobotType.MISSILE){
+			return true;
+		}else if(type == RobotType.TANK){
+			return true;
+		}else if(type == RobotType.COMMANDER){
+			return true;
+		}else if(type == RobotType.HQ){
+			return true;
+		}else if(type == RobotType.TOWER){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }
