@@ -88,23 +88,25 @@ public class Drone extends BaseRobot {
 			}
 			if(closestToWaypoint != null){
 				basicPathingSafe(rc.getLocation().directionTo(closestToWaypoint.location));
-				return;
 			}
-			for(RobotInfo ri: tanks){
-				int toSupply = 0;
-				if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 50)
-					toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
-				else if(ri.supplyLevel < 2000)
-					toSupply = (int) Math.min(2000, rc.getSupplyLevel()/2);
-				if(rc.senseRobotAtLocation(ri.location) != null){
-					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
-						if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
-							rc.transferSupplies(toSupply, ri.location);
-							break;
+
+			if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 60){
+				for(RobotInfo ri: tanks){
+					int toSupply = 0;
+					if(rc.getLocation().distanceSquaredTo(ComSystem.getLocation(199)) < 50)
+						toSupply = Math.max((int) rc.getSupplyLevel() - 150,0);
+					else if(ri.supplyLevel < 2000)
+						toSupply = (int) Math.min(2000, rc.getSupplyLevel()/2);
+					if(rc.senseRobotAtLocation(ri.location) != null){
+						if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
+							if(ri.location.distanceSquaredTo(rc.getLocation())< 15){
+								rc.transferSupplies(toSupply, ri.location);
+								break;
+							}
+
 						}
 
 					}
-
 				}
 			}
 			if(rc.getSupplyLevel() < 1000){

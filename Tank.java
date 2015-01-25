@@ -7,12 +7,14 @@ public class Tank extends BaseRobot {
 	public RobotController rc;
 	public MapLocation lastWaypoint;
 	public MapLocation currentWaypoint;
+	public boolean beWimp;
 	
 	public Tank(RobotController rcin){
 		super(rcin);
 		rc = rcin;
 		currentWaypoint =ourHQ;
 		lastWaypoint = ourHQ;
+		beWimp = true;
 	}
 	
 	@Override
@@ -27,11 +29,19 @@ public class Tank extends BaseRobot {
 		if(!currentWaypoint.equals(ComSystem.getLocation(199))){
 			lastWaypoint = currentWaypoint;
 			currentWaypoint = ComSystem.getLocation(199);
+			beWimp = true;
+			rc.broadcast(59059, 0);
 		}
 		
 	}
 
 	private void warMonger() throws GameActionException {
+		beWimp = (!beWimp)? beWimp:robotsOnTeam(RobotType.TANK, 500, rc.getTeam()).length < 20;
+		if(!beWimp){
+			rc.broadcast(59059, 1);
+		}
+		beWimp = rc.readBroadcast(59059) == 0;
+		
 		dartAway(); //detectAvoidDanger();
 		destroy();
 		supplyChain();
@@ -95,10 +105,11 @@ public class Tank extends BaseRobot {
 	}
 	
 	private void dartAway() throws GameActionException {
+		if(!beWimp ) return;
 		RobotInfo[] Robots = rc.senseNearbyRobots(30, rc.getTeam().opponent());
 		for(RobotInfo ri: Robots){
 			if(rc.getLocation().distanceSquaredTo(ri.location) <= ri.type.attackRadiusSquared){
-				moveAsCloseToDirection(ri.location.directionTo(rc.getLocation()));
+				basicPathingSafe(ri.location.directionTo(rc.getLocation()));
 			}
 		}
 	}
@@ -126,7 +137,6 @@ public class Tank extends BaseRobot {
 					badLoc = true;
 				}
 				
-				boolean beWimp = robotsOnTeam(RobotType.TANK, 100, rc.getTeam()).length < 40;
 				for(MapLocation loc: rc.senseEnemyTowerLocations()){
 					if(wouldMoveTo.distanceSquaredTo(loc) <= 24 && beWimp){//RobotType.TOWER.attackRadiusSquared){
 						badLoc = true;

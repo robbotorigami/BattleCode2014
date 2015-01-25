@@ -329,6 +329,10 @@ public abstract class BaseRobot {
 					}
 				}
 				
+				if(rc.getLocation().add(dir).distanceSquaredTo(rc.senseEnemyHQLocation()) <=RobotType.HQ.attackRadiusSquared){
+					badLoc = true;
+				}
+				
 				if(rc.canMove(dir)&&rc.isCoreReady() && !badLoc){
 					oldLocs.add(rc.getLocation().add(dir));
 					oldLocs.remove(0);

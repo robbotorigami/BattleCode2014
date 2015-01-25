@@ -55,8 +55,8 @@ public class HQ extends BaseRobot {
 			SWARMAMOUNT = 10;
 		MapLocation[] towersRank = rankTowers();
 		int numWaypoints = 2;
-		if(towersRank.length > 4){
-			numWaypoints += towersRank.length - 4;
+		if(towersRank.length > 2){
+			numWaypoints += towersRank.length - 2;
 		}
 		int red = 255;
 		for(int i = 0; i < towersRank.length; i++){
@@ -67,7 +67,7 @@ public class HQ extends BaseRobot {
 		waypoints[0] = rc.getLocation().add(rc.getLocation().directionTo(rc.senseEnemyHQLocation()), actWaypointDis);
 		int i = 1;
 		for(MapLocation loc:towersRank){
-			if(towersRank.length-i <4){
+			if(towersRank.length-i <2){
 				break;
 			}
 			waypoints[i] = loc;
