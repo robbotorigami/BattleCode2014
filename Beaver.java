@@ -8,6 +8,7 @@ public class Beaver extends BaseRobot {
 	public int turnsMoved;
 	public int buildingTries;
 	public Direction dir;
+	public int specialOps;
 	
 	public Beaver(RobotController rcin){
 		super(rcin);
@@ -19,18 +20,79 @@ public class Beaver extends BaseRobot {
 		};
 		dir = possible[rand.nextInt(3)];
 		buildingTries = 0;
+		
+		specialOps = Math.max(robotsOfTypeOnTeam(RobotType.BEAVER, rc.getTeam())-2,0);
 	}
 	
 	
 	@Override
 	public void run() throws GameActionException {
 		supplyChain();
+		if(specialOps ==0){
+			schityBuilder();
+		}else{
+			buildTowerProtection();
+		}
+		rc.yield();
+
+	}
+	
+	private void buildTowerProtection() throws GameActionException{
+		MapLocation currentTarget;
+		MapLocation[] ourTowers = rc.senseTowerLocations();
+		if(specialOps == 1){
+			int i = 0;
+			while(!towerInNeed(ourTowers[i])){
+				i++;
+				if(i>ourTowers.length-1){
+					specialOps =0;
+					return;
+				}
+			}
+			currentTarget = ourTowers[i].add(Direction.SOUTH);
+		}else{
+			int i = ourTowers.length - 1;
+			while(!towerInNeed(ourTowers[i])){
+				i--;
+				if(i < 0){
+					specialOps =0;
+					return;
+				}
+			}
+			currentTarget = ourTowers[i].add(Direction.SOUTH);
+		}
+		if(rc.getLocation().distanceSquaredTo(currentTarget) <= 2){
+			if(rc.canBuild(rc.getLocation().directionTo(currentTarget), RobotType.BARRACKS) && rc.isCoreReady()){
+				rc.build(rc.getLocation().directionTo(currentTarget), RobotType.BARRACKS);
+			}
+		}else{
+			basicPathing(rc.getLocation().directionTo(currentTarget));
+		}
+	}
+	private boolean towerInNeed(MapLocation tower) throws GameActionException {
+		for(Direction dir: Direction.values()){
+			MapLocation toCheck = tower.add(dir);
+			if(rc.canSenseLocation(toCheck)&& rc.senseRobotAtLocation(toCheck) != null && rc.senseRobotAtLocation(toCheck).type == RobotType.BARRACKS){
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	private void schityBuilder() throws GameActionException{
 		RobotType toBuild = null;
 		if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 1){
 			toBuild = RobotType.MINERFACTORY;
 		} 
 		else if(robotsOfTypeOnTeam(RobotType.MINERFACTORY,rc.getTeam()) < 2){
 			toBuild = RobotType.MINERFACTORY;
+		}
+		else if(robotsOfTypeOnTeam(RobotType.BARRACKS, rc.getTeam()) < 1 + rc.senseTowerLocations().length){
+			toBuild = RobotType.BARRACKS;
+		}
+		else if(robotsOfTypeOnTeam(RobotType.TANKFACTORY, rc.getTeam()) < 1){
+			toBuild = RobotType.TANKFACTORY;
 		}
 		else if(robotsOfTypeOnTeam(RobotType.HELIPAD, rc.getTeam()) < 1){
 			toBuild = RobotType.HELIPAD;
@@ -41,13 +103,13 @@ public class Beaver extends BaseRobot {
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 1 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6){
 			buildUnit(RobotType.BARRACKS);
 		}*/
-		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 1){
+		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 2 + rc.senseTowerLocations().length){
 			toBuild = RobotType.BARRACKS;
 		}
 		else if(robotsOfTypeOnTeam(RobotType.TANKFACTORY,rc.getTeam()) < 6){
 			toBuild = RobotType.TANKFACTORY;
 		}
-		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 10 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 2* robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam())){
+		else if(robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam()) < 10 && robotsOfTypeOnTeam(RobotType.TANK, rc.getTeam()) > 3* robotsOfTypeOnTeam(RobotType.SUPPLYDEPOT, rc.getTeam())){
 			toBuild = RobotType.SUPPLYDEPOT;
 		}/*
 		else if(robotsOfTypeOnTeam(RobotType.BARRACKS,rc.getTeam()) < 2 && rc.getLocation().distanceSquaredTo(ourHQ) >= 6*6 && robotsOfTypeOnTeam(RobotType.LAUNCHER, rc.getTeam()) > 6){
@@ -64,8 +126,6 @@ public class Beaver extends BaseRobot {
 			}
 		}
 		rc.setIndicatorString(0, buildingTries+"");
-		rc.yield();
-
 	}
 	
 	private void supplyChain() throws GameActionException{
@@ -87,3 +147,4 @@ public class Beaver extends BaseRobot {
 	}
 
 }
+

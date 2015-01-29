@@ -10,11 +10,10 @@ public class HQ extends BaseRobot {
 	public int currentWaypoint;
 	public final int WAYPOINTMAXDISTANCE = 10;
 	public final int SWARMCHANNEL = 199;
-	public final int SWARMDISTANCE = 10;
+	public final int SWARMDISTANCE = 60;
 	public int SWARMAMOUNT = 10;
 	public final int SWARMOVERLOAD = 20;
 	int Profiler;
-
 	public HQ(RobotController rcin){
 		super(rcin);
 		rc = rcin;
@@ -27,14 +26,14 @@ public class HQ extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		Profiler = Clock.getBytecodesLeft();
+		//Profiler = Clock.getBytecodesLeft();
 		ComSystem.clearUselessMiners();
 		ComSystem.clearMiningInfo();
-		System.out.print((Clock.getBytecodesLeft() - Profiler) + ", ");
+		//System.out.print((Clock.getBytecodesLeft() - Profiler) + ", ");
 		handleSwarm();
 		supplyChain();
-		shootWeakest();
-		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 3){
+		destroy();
+		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 5){
 			spawnUnit(RobotType.BEAVER);
 		}
 		if(robotsOfTypeOnTeam(RobotType.BEAVER,rc.getTeam()) < 10 && rc.getTeamOre() >600){
@@ -59,7 +58,7 @@ public class HQ extends BaseRobot {
 			numWaypoints += towersRank.length - 2;
 		}
 		int red = 255;
-		for(int i = 0; i < towersRank.length; i++){
+		for(int i = 0; i < numWaypoints - 2; i++){
 			rc.setIndicatorDot(towersRank[i].add(Direction.NORTH), red, 255-red, 0);
 			red -= 50;
 		}
@@ -79,20 +78,29 @@ public class HQ extends BaseRobot {
 
 	public void handleSwarm() throws GameActionException{
 		ComSystem.clearSync(57575);
+		rc.setIndicatorString(0, ComSystem.readSync(57575) + " At waypoint");
 
 		int numTanks = robotsOfTypeOnTeam(RobotType.TANK, rc.getTeam());
-		
-		if(numTanks>SWARMAMOUNT){
-			if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
+		//numTanks += robotsOfTypeOnTeam(RobotType.SOLDIER, rc.getTeam());
+		if(rc.readBroadcast(21) > 20){
+			rc.broadcast(21, 0);
+			currentWaypoint--;
+			if(currentWaypoint < 0){
 				currentWaypoint++;
 			}
 		}
-		if((numTanks> SWARMOVERLOAD || Clock.getRoundNum()>1200) && currentWaypoint <1){
-			currentWaypoint = 1;
-		}
+		
 		if(Clock.getRoundNum() > rc.getRoundLimit() - 400){
 			currentWaypoint = waypoints.length-1;
 		}
+		else if((numTanks> SWARMOVERLOAD || Clock.getRoundNum()>1200) && currentWaypoint <1){
+			currentWaypoint = 1;
+		}
+		else if(numTanks>SWARMAMOUNT){
+			if(robotsAtWaypoint() && currentWaypoint < waypoints.length-1){
+				currentWaypoint++;
+			}
+		} 
 		if(currentWaypoint == 0){
 			ComSystem.sendLocation(199, waypoints[currentWaypoint], true);
 		}else{
@@ -102,36 +110,63 @@ public class HQ extends BaseRobot {
 
 	}
 
-	public boolean robotsAtWaypoint(){
+	public boolean robotsAtWaypoint() throws GameActionException{
+		if(!towerAlive()) return true;
+		return ComSystem.readSync(57575) >= 6;
+		/*
 		int sumInRange = 0;
 		int sumLocx = 0;
 		int sumLocy = 0;
 		int total = 0;
-		Profiler = Clock.getBytecodesLeft();
+		//Profiler = Clock.getBytecodesLeft();
 		RobotInfo[] robots = robotsOnTeam(RobotType.TANK, rc.getTeam()); 
-		System.out.println(Clock.getBytecodesLeft() - Profiler);
+		//System.out.println(Clock.getBytecodesLeft() - Profiler);
 		for(RobotInfo ri: robots){
 			if(ri == null) break;
-			sumLocx+=ri.location.x;
-			sumLocy+=ri.location.y;
+			//sumLocx+=ri.location.x;
+			//sumLocy+=ri.location.y;
 			if(ri.location.distanceSquaredTo(waypoints[currentWaypoint]) < SWARMDISTANCE){
 				sumInRange++;
 			}
 			total++;
 		}
-		MapLocation center = new MapLocation(sumLocx/total, sumLocy/total);
+		
+		robots = robotsOnTeam(RobotType.SOLDIER, rc.getTeam()); 
+		for(RobotInfo ri: robots){
+			if(ri == null) break;
+			//sumLocx+=ri.location.x;
+			//sumLocy+=ri.location.y;
+			if(ri.location.distanceSquaredTo(waypoints[currentWaypoint]) < SWARMDISTANCE){
+				sumInRange++;
+			}
+			total++;
+		}
+		//MapLocation center = new MapLocation(sumLocx/total, sumLocy/total);
 		if(sumInRange> 0.7*SWARMAMOUNT){
+			return true;
+		}
+		return false;*/
+	}
+	
+	private boolean towerAlive() {
+		if(currentWaypoint != 0 && currentWaypoint != waypoints.length-1){
+			for(MapLocation loc:rc.senseEnemyTowerLocations()){
+				if(loc.equals(waypoints[currentWaypoint])){
+					return true;
+				}
+			}
+		}else{
 			return true;
 		}
 		return false;
 	}
-	
+
 	private void supplyChain() throws GameActionException{
 		RobotInfo[] Robots = rc.senseNearbyRobots(15, rc.getTeam());
 		for(RobotInfo ri: Robots){
 			if(ri.supplyLevel<200 && ri.type == RobotType.DRONE){
 				int toSupply = 0;
-				toSupply = (int)rc.getSupplyLevel()/2;
+				toSupply = (int) (rc.getSupplyLevel()/1.5);
 				if(rc.senseRobotAtLocation(ri.location) != null){
 					if(rc.senseRobotAtLocation(ri.location).team == rc.getTeam()){
 						rc.transferSupplies(toSupply, ri.location);

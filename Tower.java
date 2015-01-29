@@ -12,7 +12,7 @@ public class Tower extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		shootWeakest();
+		destroy();
 		rc.yield();
 
 	}

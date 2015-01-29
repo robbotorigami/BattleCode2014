@@ -617,4 +617,38 @@ public abstract class BaseRobot {
 			return false;
 		}
 	}
+	
+	/**
+	 * Better shooting code
+	 * @throws GameActionException
+	 */
+	public void destroy() throws GameActionException {
+		RobotInfo[] enemies = rc.senseNearbyRobots(40, rc.getTeam().opponent());
+		RobotInfo toDestroy = null;
+		int lowestHealth =100000;
+		int lowestID = 1000000;
+		for(RobotInfo enemy : enemies){
+			if(enemy.type == RobotType.TOWER){
+				toDestroy = enemy;
+				break;
+			}
+			if(enemy.type == RobotType.HQ){
+				toDestroy = enemy;
+				break;
+			}
+			boolean beatsBest = (enemy.health < lowestHealth)? true: enemy.ID < lowestID;
+			if(beatsBest){
+				lowestHealth = (int) enemy.health;
+				lowestID = enemy.ID;
+				toDestroy = enemy;
+			}
+		}
+		if(toDestroy != null)
+			if(rc.isWeaponReady()&&rc.canAttackLocation(toDestroy.location)){
+				rc.attackLocation(toDestroy.location);
+			}
+		
+		
+	}
 }
+

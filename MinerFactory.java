@@ -13,7 +13,7 @@ public class MinerFactory extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
-		if(ComSystem.getUselessMiners() < 10){
+		if(ComSystem.getUselessMiners() < 10 && robotsOfTypeOnTeam(RobotType.MINER, rc.getTeam()) < 30){
 			spawnUnit(RobotType.MINER);
 		}
 		rc.yield();

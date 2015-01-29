@@ -8,10 +8,12 @@ public class Tank extends BaseRobot {
 	public MapLocation lastWaypoint;
 	public MapLocation currentWaypoint;
 	public boolean beWimp;
+	public boolean notDed;
 	
 	public Tank(RobotController rcin){
 		super(rcin);
 		rc = rcin;
+		notDed = true;
 		currentWaypoint =ourHQ;
 		lastWaypoint = ourHQ;
 		beWimp = true;
@@ -19,6 +21,17 @@ public class Tank extends BaseRobot {
 	
 	@Override
 	public void run() throws GameActionException {
+		if(rc.getLocation().distanceSquaredTo(currentWaypoint) <= 2){
+			ComSystem.incSync(57575);
+		}
+		/*if(rc.getHealth() <20 && notDed){
+			//we ded
+			rc.broadcast(21, rc.readBroadcast(21)+1);
+			notDed = false;
+		}*/
+		if(rc.getLocation().distanceSquaredTo(currentWaypoint) < 40 && robotsOnTeam(RobotType.TANK, 80, rc.getTeam()).length < 8){
+			rc.broadcast(21,  200);
+		}
 		updateWaypoint();
 		warMonger();
 		rc.yield();
@@ -30,22 +43,40 @@ public class Tank extends BaseRobot {
 			lastWaypoint = currentWaypoint;
 			currentWaypoint = ComSystem.getLocation(199);
 			beWimp = true;
-			rc.broadcast(59059, 0);
+			//rc.broadcast(59059, 0);
 		}
 		
 	}
 
 	private void warMonger() throws GameActionException {
-		beWimp = (!beWimp)? beWimp:robotsOnTeam(RobotType.TANK, 500, rc.getTeam()).length < 20;
+		/*beWimp = (!beWimp)? beWimp:robotsOnTeam(RobotType.TANK, 500, rc.getTeam()).length < 20;
 		if(!beWimp){
 			rc.broadcast(59059, 1);
 		}
-		beWimp = rc.readBroadcast(59059) == 0;
+		beWimp = rc.readBroadcast(59059) == 0;*/
+		int total = 0;
+		RobotInfo[] bots = rc.senseNearbyRobots(currentWaypoint, 50, rc.getTeam());
+		for(RobotInfo bot: bots){
+			if(bot.type == RobotType.TANK){
+				total++;
+			}
+		}
+		beWimp = total < 10 && Clock.getRoundNum() < rc.getRoundLimit()-400;
 		
 		dartAway(); //detectAvoidDanger();
 		destroy();
 		supplyChain();
 		basicPathingSwarm(rc.getLocation().directionTo(currentWaypoint));
+	}
+	
+	private int howManyFriendsIsSafe() throws GameActionException{
+		if(rc.canSenseLocation(currentWaypoint)){
+			RobotInfo target = rc.senseRobotAtLocation(currentWaypoint);
+			if(target != null){
+				return (int) (13*target.health/target.type.maxHealth);
+			}
+		}
+		return 10;
 	}
 	
 	private void supplyChain() throws GameActionException{
@@ -68,7 +99,8 @@ public class Tank extends BaseRobot {
 		}
 	}
 	
-	private void destroy() throws GameActionException {
+	@Override
+	public void destroy() throws GameActionException {
 		RobotInfo[] enemies = rc.senseNearbyRobots(40, rc.getTeam().opponent());
 		RobotInfo toDestroy = null;
 		int lowestHealth =100000;
@@ -115,6 +147,8 @@ public class Tank extends BaseRobot {
 	}
 	
 	public boolean basicPathingSwarm(Direction toMove) throws GameActionException{
+		//If we are close enough to the waypoint, don't even bother moving
+		if(rc.getLocation().distanceSquaredTo(currentWaypoint) <= 2) return false;
 		if(rc.isCoreReady()){
 			oldLocs.remove(0);
 			while(oldLocs.size() < NUMOLDLOCS){
@@ -160,3 +194,4 @@ public class Tank extends BaseRobot {
 	}
 
 }
+
